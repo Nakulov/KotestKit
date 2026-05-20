@@ -5,11 +5,9 @@ plugins {
 group = "com.simple.kotest"
 version = "1.0-SNAPSHOT"
 
-repositories {
-  mavenCentral()
-}
 
 dependencies {
+  implementation(libs.kotest.runner.junit5)
   testImplementation(kotlin("test"))
 }
 
