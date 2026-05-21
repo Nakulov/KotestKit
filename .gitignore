@@ -3,6 +3,7 @@
 .idea/
 build/
 
+*.properties
 *.class
 
 # Log file
