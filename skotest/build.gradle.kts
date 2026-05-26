@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.simple.kotest"
-version = "1.0.1"
+version = "1.0.2"
 
 dependencies {
     implementation(libs.kotest.runner.junit5)
@@ -21,7 +21,7 @@ publishing {
             from(components["java"])
             groupId = "com.simple.kotest"
             artifactId = "skotest"
-            version = "1.0.1"
+            version = "1.0.2"
         }
     }
     repositories {
