@@ -3,9 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/SKotest.iml" filepath="$PROJECT_DIR$/.idea/SKotest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/skotest.iml" filepath="$PROJECT_DIR$/skotest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/skotest.main.iml" filepath="$PROJECT_DIR$/.idea/modules/skotest.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/skotest.test.iml" filepath="$PROJECT_DIR$/.idea/modules/skotest.test.iml" />
     </modules>
   </component>
 </project>
