@@ -54,6 +54,7 @@ Priority на доске (P0, P1, P2).
 |---------------------|-------------------------------------------------|
 | Код библиотеки      | `src/main/kotlin/`                              |
 | Сборка и версии     | `build.gradle.kts`, `gradle/libs.versions.toml` |
+| Правила тестов      | `TESTING.md`                                    |
 | Скиллы процесса     | `.claude/skills/groom`, `take`                  |
 | Работа с доской     | `tools/board.sh`                                |
 | Шаблоны задачи и PR | `.github/`                                                      |
