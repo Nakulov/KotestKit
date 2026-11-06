@@ -1,9 +1,7 @@
 @file:OptIn(ExperimentalCoroutinesApi::class)
 
-package io.github.nakulov.kotestkit.exception
+package io.github.nakulov.kotestkit
 
-import io.github.nakulov.kotestkit.TestOptions
-import io.github.nakulov.kotestkit.case
 import io.github.nakulov.kotestkit.testing.BEHAVIOR_CONTAINERS
 import io.github.nakulov.kotestkit.testing.inEachContainer
 import io.github.nakulov.kotestkit.testing.runBehaviorSpec
@@ -15,7 +13,6 @@ import io.github.nakulov.kotestkit.testing.runFunSpec
 import io.github.nakulov.kotestkit.testing.runShouldSpec
 import io.github.nakulov.kotestkit.testing.runStringSpec
 import io.github.nakulov.kotestkit.testing.runWordSpec
-import io.github.nakulov.kotestkit.withData
 import io.kotest.core.NamedTag
 import io.kotest.core.extensions.TestCaseExtension
 import io.kotest.core.spec.style.StringSpec
