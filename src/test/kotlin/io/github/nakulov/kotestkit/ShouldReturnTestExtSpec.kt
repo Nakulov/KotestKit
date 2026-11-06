@@ -24,6 +24,7 @@ import io.kotest.core.test.TestCaseSeverityLevel
 import io.kotest.core.test.TestType
 import io.kotest.core.test.config.TestConfig
 import io.kotest.engine.test.TestResult
+import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeSameInstanceAs
@@ -240,27 +241,26 @@ class ShouldReturnTestExtSpec : StringSpec({
         calls.get() shouldBe 1
     }
 
-    "withData: верное ожидание создаёт успешный конечный тест" {
+    "withGivens: неверное ожидание роняет конечный тест, а не контейнер" {
         val run = runBehaviorSpec {
-            withData(nameFn = { "c" }, case(1)) { _ ->
-                shouldReturnTest(3) { 3 }
-            }
-        }
-
-        val test = run.childrenOf(listOf("c")).single()
-        test.name shouldBe "expected 3"
-        test.result.isSuccess shouldBe true
-    }
-
-    "withData: неверное ожидание роняет конечный тест, а не контейнер" {
-        val run = runBehaviorSpec {
-            withData(nameFn = { "c" }, case(1)) { _ ->
+            withGivens(nameFn = { "c" }, case(1)) { _ ->
                 shouldReturnTest(999) { 3 }
             }
         }
 
         run.childrenOf(listOf("c")).single().result.isFailure shouldBe true
         run.tests.single { it.path == listOf("c") }.result.isSuccess shouldBe true
+    }
+
+    "матчер plusOrMinus как ожидание: верное значение проходит, неверное падает" {
+        val run = runStringSpec {
+            shouldReturnTest(0.3 plusOrMinus 1e-9, options = TestOptions(name = "верное")) { 0.1 + 0.2 }
+            shouldReturnTest(0.3 plusOrMinus 1e-9, options = TestOptions(name = "неверное")) { 0.4 }
+        }
+
+        run.tests.map { it.name } shouldBe listOf("верное", "неверное")
+        run.tests.first().result.isSuccess shouldBe true
+        run.tests.last().result.isFailure shouldBe true
     }
 
     "контейнеры BehaviorSpec, 0–8 входов: каждый вызов создаёт один успешный конечный тест" {
