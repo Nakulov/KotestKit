@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.2.20"
+    alias(libs.plugins.kotlin.jvm)
     `maven-publish`
 }
 
@@ -7,21 +7,19 @@ group = "io.github.nakulov"
 version = "1.0.3"
 
 dependencies {
-    implementation(libs.kotest.runner.junit5)
+    api(libs.kotest.runner.junit5)
+    api(libs.kotest.assertions.core)
     testImplementation(kotlin("test"))
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(17)
 }
 
 publishing {
     publications {
         create<MavenPublication>("gpr") {
             from(components["java"])
-            groupId = "io.github.nakulov"
-            artifactId = "kotestkit"
-            version = "1.0.3"
         }
     }
     repositories {
