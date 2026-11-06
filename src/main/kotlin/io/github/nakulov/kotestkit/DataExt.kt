@@ -1,4 +1,4 @@
-package com.simple.kotest
+package io.github.nakulov.kotestkit
 
 import io.kotest.core.spec.style.scopes.BehaviorSpecContextContainerScope
 import io.kotest.core.spec.style.scopes.BehaviorSpecRootScope

@@ -3,7 +3,7 @@ plugins {
     `maven-publish`
 }
 
-group = "com.simple.kotest"
+group = "io.github.nakulov"
 version = "1.0.3"
 
 dependencies {
@@ -19,15 +19,15 @@ publishing {
     publications {
         create<MavenPublication>("gpr") {
             from(components["java"])
-            groupId = "com.simple.kotest"
-            artifactId = "skotest"
+            groupId = "io.github.nakulov"
+            artifactId = "kotestkit"
             version = "1.0.3"
         }
     }
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/Nakulov/SKotest")
+            url = uri("https://maven.pkg.github.com/Nakulov/KotestKit")
             credentials(PasswordCredentials::class)
         }
     }

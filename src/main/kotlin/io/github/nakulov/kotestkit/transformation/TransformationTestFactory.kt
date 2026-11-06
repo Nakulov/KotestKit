@@ -1,4 +1,4 @@
-package com.simple.kotest.transformation
+package io.github.nakulov.kotestkit.transformation
 
 import io.kotest.core.factory.TestFactory
 import io.kotest.core.spec.style.stringSpec

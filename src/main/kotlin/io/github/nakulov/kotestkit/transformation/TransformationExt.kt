@@ -1,4 +1,4 @@
-package com.simple.kotest.transformation
+package io.github.nakulov.kotestkit.transformation
 
 import io.kotest.core.spec.DslDrivenSpec
 import io.kotest.core.spec.style.scopes.BehaviorSpecContextContainerScope

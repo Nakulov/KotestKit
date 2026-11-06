@@ -1,4 +1,4 @@
-package com.simple.kotest.exception
+package io.github.nakulov.kotestkit.exception
 
 fun interface ShouldThrowCaller {
 

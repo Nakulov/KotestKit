@@ -1,7 +1,7 @@
-package com.simple.kotest.exception
+package io.github.nakulov.kotestkit.exception
 
-import com.simple.kotest.then
-import com.simple.kotest.`when`
+import io.github.nakulov.kotestkit.then
+import io.github.nakulov.kotestkit.`when`
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.assertions.throwables.shouldThrowWithMessage

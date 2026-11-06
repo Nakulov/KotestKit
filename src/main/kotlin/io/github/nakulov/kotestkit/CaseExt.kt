@@ -1,4 +1,4 @@
-package com.simple.kotest
+package io.github.nakulov.kotestkit
 
 fun <A1> case(
     arg1: A1

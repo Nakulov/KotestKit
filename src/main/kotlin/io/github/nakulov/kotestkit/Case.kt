@@ -1,4 +1,4 @@
-package com.simple.kotest
+package io.github.nakulov.kotestkit
 
 data class Case1<A1>(
     val arg1: A1
