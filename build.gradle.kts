@@ -11,6 +11,7 @@ dependencies {
     api(libs.kotest.assertions.core)
 
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
 }
 
 kotlin {
@@ -19,6 +20,9 @@ kotlin {
 
 tasks.test {
     useJUnitPlatform()
+    // ReadmeSyncSpec читает эти файлы при запуске: без входов правка только в них оставляет test в UP-TO-DATE.
+    inputs.file("README.md")
+    inputs.dir("src/test/kotlin/io/github/nakulov/kotestkit/readme")
 }
 
 publishing {
