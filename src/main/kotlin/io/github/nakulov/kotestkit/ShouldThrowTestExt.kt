@@ -1,9 +1,5 @@
-package io.github.nakulov.kotestkit.exception
+package io.github.nakulov.kotestkit
 
-import io.github.nakulov.kotestkit.INSIDE_TEST_MESSAGE
-import io.github.nakulov.kotestkit.TestOptions
-import io.github.nakulov.kotestkit.displayValue
-import io.github.nakulov.kotestkit.leafTest
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.assertions.throwables.shouldThrowWithMessage

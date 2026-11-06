@@ -9,8 +9,7 @@ private val OBJECT_ADDRESS = Regex("""\b(?:[a-z_]\w*\.)+([A-Z][\w$]*)(?:/0x[0-9a
 /** Классы библиотеки на пути от вызова до регистрации. Сравниваются точно: спеки лежат в тех же пакетах. */
 private val LIBRARY_CLASSES = setOf(
     "io.github.nakulov.kotestkit.TestReportKt",
-    "io.github.nakulov.kotestkit.transformation.TransformationExtKt",
-    "io.github.nakulov.kotestkit.transformation.TransformationTestFactoryKt",
+    "io.github.nakulov.kotestkit.ShouldReturnTestExtKt",
 )
 
 /** Показ значения в имени теста: как у `print()` из Kotest, но без адресов объектов и не длиннее лимита. */
