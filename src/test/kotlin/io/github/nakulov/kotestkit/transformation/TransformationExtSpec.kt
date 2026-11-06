@@ -3,6 +3,7 @@ package io.github.nakulov.kotestkit.transformation
 import io.github.nakulov.kotestkit.TestOptions
 import io.github.nakulov.kotestkit.case
 import io.github.nakulov.kotestkit.testing.BEHAVIOR_CONTAINERS
+import io.github.nakulov.kotestkit.testing.RanTest
 import io.github.nakulov.kotestkit.testing.inEachContainer
 import io.github.nakulov.kotestkit.testing.runBehaviorSpec
 import io.github.nakulov.kotestkit.testing.runDescribeSpec
@@ -27,6 +28,7 @@ import io.kotest.core.test.TestType
 import io.kotest.core.test.config.TestConfig
 import io.kotest.engine.test.TestResult
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeSameInstanceAs
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration.Companion.minutes
@@ -80,27 +82,37 @@ class TransformationExtSpec : StringSpec({
         }
 
         run.tests.map { it.name } shouldBe listOf(
-            "transformation to Int",
-            "transformation Int to Int",
+            "expected 3",
+            "1 -> 3",
             "0 входов",
             "1 вход",
         )
         run.tests.map { it.result.isSuccess } shouldBe List(4) { true }
     }
 
-    "без options используется имя по умолчанию" {
+    "корень, 0–8 входов: имя по умолчанию показывает значения, порядок входов сохранён" {
         val run = runStringSpec {
             transformationTest(0) { 0 }
-            transformationTest(1, "abc") { 1 }
-            transformationTest(2, 1, 1) { _, _ -> 2 }
-            transformationTest(3, "a", 1, 1) { _, _, _ -> 3 }
+            transformationTest(1, "a") { 1 }
+            transformationTest(2, "a", 1) { _, _ -> 2 }
+            transformationTest(3, "a", 1, null) { _, _, _ -> 3 }
+            transformationTest(4, 1, 2, 3, 4) { _, _, _, _ -> 4 }
+            transformationTest(5, 1, 2, 3, 4, 5) { _, _, _, _, _ -> 5 }
+            transformationTest(6, 1, 2, 3, 4, 5, 6) { _, _, _, _, _, _ -> 6 }
+            transformationTest(7, 1, 2, 3, 4, 5, 6, 7) { _, _, _, _, _, _, _ -> 7 }
+            transformationTest(8, 1, 2, 3, 4, 5, 6, 7, 8) { _, _, _, _, _, _, _, _ -> 8 }
         }
 
         run.tests.map { it.name } shouldBe listOf(
-            "transformation to Int",
-            "transformation String to Int",
-            "transformation Int and Int to Int",
-            "transformation String and Int and Int to Int",
+            "expected 0",
+            "\"a\" -> 1",
+            "(\"a\", 1) -> 2",
+            "(\"a\", 1, <null>) -> 3",
+            "(1, 2, 3, 4) -> 4",
+            "(1, 2, 3, 4, 5) -> 5",
+            "(1, 2, 3, 4, 5, 6) -> 6",
+            "(1, 2, 3, 4, 5, 6, 7) -> 7",
+            "(1, 2, 3, 4, 5, 6, 7, 8) -> 8",
         )
     }
 
@@ -110,7 +122,7 @@ class TransformationExtSpec : StringSpec({
         }
 
         val test = run.tests.single()
-        test.name shouldBe "transformation to Int"
+        test.name shouldBe "expected 0"
         test.config?.blockingTest shouldBe true
     }
 
@@ -239,7 +251,7 @@ class TransformationExtSpec : StringSpec({
         }
 
         val test = run.childrenOf(listOf("c")).single()
-        test.name shouldBe "transformation to Int"
+        test.name shouldBe "expected 3"
         test.result.isSuccess shouldBe true
     }
 
@@ -268,14 +280,14 @@ class TransformationExtSpec : StringSpec({
         }
     }
 
-    "контейнер: имя по умолчанию называет типы входов, null как null" {
+    "контейнер: имя по умолчанию показывает значения входов, null как <null>" {
         val run = runBehaviorSpec {
             Given("g") {
                 transformationTest(0, "a", 1, null) { _, _, _ -> 0 }
             }
         }
 
-        run.childrenOf(listOf("g")).single().name shouldBe "transformation String and Int and null to Int"
+        run.childrenOf(listOf("g")).single().name shouldBe "(\"a\", 1, <null>) -> 0"
     }
 
     "контейнер, 0–8 входов: options.name заменяет имя" {
@@ -355,24 +367,252 @@ class TransformationExtSpec : StringSpec({
 
         runs.forEach { run ->
             val test = run.childrenOf(listOf("c")).single()
-            test.name shouldBe "transformation to Int"
+            test.name shouldBe "expected 0"
             test.result.isSuccess shouldBe true
             test.type shouldBe TestType.Test
             test.prefix shouldBe null
         }
     }
+
+    "корень и контейнер: разные значения в одном скоупе не дают номеров" {
+        val run = runBehaviorSpec {
+            transformationTest(1, "a") { it.length }
+            transformationTest(1, "b") { it.length }
+            Given("g") {
+                transformationTest(1, "a") { it.length }
+                transformationTest(2, "ab") { it.length }
+            }
+        }
+
+        run.tests.filter { it.type == TestType.Test }.map { it.name } shouldBe listOf(
+            "\"a\" -> 1",
+            "\"b\" -> 1",
+            "\"a\" -> 1",
+            "\"ab\" -> 2",
+        )
+    }
+
+    "полностью одинаковые вызовы сохраняют номер от Kotest" {
+        val run = runStringSpec {
+            transformationTest(1, "a") { it.length }
+            transformationTest(1, "a") { it.length }
+        }
+
+        run.tests.map { it.name } shouldBe listOf("\"a\" -> 1", "(1) \"a\" -> 1")
+    }
+
+    "значения показываются без адресов объектов" {
+        val lambda: () -> Int = { 1 }
+        val suspendLambda: suspend () -> Int = { 1 }
+        val cases = listOf<Pair<Any?, String>>(
+            "abc" to "\"abc\"",
+            3 to "3",
+            Color.RED to "RED",
+            User(1) to "User(id=1)",
+            listOf(1, 2) to "[1, 2]",
+            Repo() to "Repo",
+            Holder(Repo()) to "Holder(repo=Repo)",
+            listOf(Repo()) to "[Repo]",
+            object {} to "<anonymous>",
+            lambda to "<lambda>",
+            "" to "<empty string>",
+            null to "<null>",
+            suspendLambda to "() -> kotlin.Int",
+            ::same to "fun same(kotlin.Int): kotlin.Int",
+            "user@abc" to "\"user@abc\"",
+            "com.acme.Foo@abc" to "\"com.acme.Foo@abc\"",
+        )
+
+        val run = runStringSpec {
+            cases.forEach { (value, _) -> transformationTest(0, value) { _ -> 0 } }
+        }
+
+        lambda::class.java.name shouldContain "\$\$Lambda"
+        run.tests.map { it.name } shouldBe cases.map { (_, shown) -> "$shown -> 0" }
+    }
+
+    "значение длиннее 40 символов обрезается, кавычки считаются" {
+        val run = runStringSpec {
+            transformationTest(0, "a".repeat(38)) { _ -> 0 }
+            transformationTest(0, "a".repeat(39)) { _ -> 0 }
+            transformationTest("b".repeat(100)) { "b".repeat(100) }
+        }
+
+        run.tests.map { it.name } shouldBe listOf(
+            "\"${"a".repeat(38)}\" -> 0",
+            "\"${"a".repeat(39)}… -> 0",
+            "expected \"${"b".repeat(39)}…",
+        )
+    }
+
+    "вход с бросающим toString: спека не падает, в имени имя класса, следующий тест выполняется" {
+        val throwing = object {
+            override fun toString(): String = error("x")
+        }
+
+        val run = runStringSpec {
+            transformationTest(0, ThrowingToString()) { _ -> 0 }
+            transformationTest(0, CyclicToString()) { _ -> 0 }
+            transformationTest(0, throwing) { _ -> 0 }
+            transformationTest(0, "следующий") { _ -> 0 }
+        }
+
+        run.specError shouldBe null
+        run.tests.map { it.name } shouldBe listOf(
+            "ThrowingToString -> 0",
+            "CyclicToString -> 0",
+            "<anonymous> -> 0",
+            "\"следующий\" -> 0",
+        )
+        run.tests.map { it.result.isSuccess } shouldBe List(4) { true }
+    }
+
+    "падение в корне, 0–8 входов: первый кадр стека — файл спеки и строка вызова" {
+        val lines = mutableListOf<Int>()
+
+        val run = runStringSpec {
+            lines += nextLine()
+            transformationTest(999) { 0 }
+            lines += nextLine()
+            transformationTest(999, 1) { a -> a }
+            lines += nextLine()
+            transformationTest(999, 1, 1) { a, b -> a + b }
+            lines += nextLine()
+            transformationTest(999, 1, 1, 1) { a, b, c -> a + b + c }
+            lines += nextLine()
+            transformationTest(999, 1, 1, 1, 1) { a, b, c, d -> a + b + c + d }
+            lines += nextLine()
+            transformationTest(999, 1, 1, 1, 1, 1) { a, b, c, d, e -> a + b + c + d + e }
+            lines += nextLine()
+            transformationTest(999, 1, 1, 1, 1, 1, 1) { a, b, c, d, e, f -> a + b + c + d + e + f }
+            lines += nextLine()
+            transformationTest(999, 1, 1, 1, 1, 1, 1, 1) { a, b, c, d, e, f, g -> a + b + c + d + e + f + g }
+            lines += nextLine()
+            transformationTest(999, 1, 1, 1, 1, 1, 1, 1, 1) { a, b, c, d, e, f, g, h -> a + b + c + d + e + f + g + h }
+        }
+
+        run.tests.map { it.firstFrame() } shouldBe lines.map { "$SPEC_FILE:$it" }
+    }
+
+    "падение в контейнере, 0–8 входов: первый кадр стека — файл спеки и строка вызова" {
+        val lines = mutableListOf<Int>()
+
+        val run = runBehaviorSpec {
+            Given("g") {
+                lines += nextLine()
+                transformationTest(999) { 0 }
+                lines += nextLine()
+                transformationTest(999, 1) { a -> a }
+                lines += nextLine()
+                transformationTest(999, 1, 1) { a, b -> a + b }
+                lines += nextLine()
+                transformationTest(999, 1, 1, 1) { a, b, c -> a + b + c }
+                lines += nextLine()
+                transformationTest(999, 1, 1, 1, 1) { a, b, c, d -> a + b + c + d }
+                lines += nextLine()
+                transformationTest(999, 1, 1, 1, 1, 1) { a, b, c, d, e -> a + b + c + d + e }
+                lines += nextLine()
+                transformationTest(999, 1, 1, 1, 1, 1, 1) { a, b, c, d, e, f -> a + b + c + d + e + f }
+                lines += nextLine()
+                transformationTest(999, 1, 1, 1, 1, 1, 1, 1) { a, b, c, d, e, f, g -> a + b + c + d + e + f + g }
+                lines += nextLine()
+                transformationTest(999, 1, 1, 1, 1, 1, 1, 1, 1) { a, b, c, d, e, f, g, h -> a + b + c + d + e + f + g + h }
+            }
+        }
+
+        run.childrenOf(listOf("g")).map { it.firstFrame() } shouldBe lines.map { "$SPEC_FILE:$it" }
+    }
+
+    "своя проверка и другое исключение в блоке: первой идёт настоящая строка в блоке" {
+        val lines = mutableListOf<Int>()
+
+        val run = runBehaviorSpec {
+            transformationTest(0, options = TestOptions("проверка в корне")) {
+                lines += nextLine()
+                1 shouldBe 2
+                0
+            }
+            transformationTest(0, options = TestOptions("исключение в корне")) {
+                lines += nextLine()
+                throw IllegalStateException("x")
+            }
+            Given("g") {
+                transformationTest(0, options = TestOptions("проверка в контейнере")) {
+                    lines += nextLine()
+                    1 shouldBe 2
+                    0
+                }
+                transformationTest(0, options = TestOptions("исключение в контейнере")) {
+                    lines += nextLine()
+                    throw IllegalStateException("x")
+                }
+            }
+        }
+
+        val tests = run.tests.filter { it.type == TestType.Test }
+        tests.map { it.result.isErrorOrFailure } shouldBe List(4) { true }
+        tests.map { it.firstFrame() } shouldBe lines.map { "$SPEC_FILE:$it" }
+    }
+
+    "явные типы и null в ожидании компилируются и работают" {
+        val run = runStringSpec {
+            transformationTest<Int, String>(1, "a") { it.length }
+            transformationTest(null, "b") { _ -> null }
+            transformationTest<Int?, String>(null, "c") { null }
+        }
+
+        run.tests.map { it.name } shouldBe listOf("\"a\" -> 1", "\"b\" -> <null>", "\"c\" -> <null>")
+        run.tests.map { it.result.isSuccess } shouldBe List(3) { true }
+    }
+
+    "контейнер: явные типы и null в ожидании компилируются и работают" {
+        val run = runBehaviorSpec {
+            Given("g") {
+                transformationTest<Int, String>(1, "a") { it.length }
+                transformationTest(null, "b") { _ -> null }
+            }
+        }
+
+        run.childrenOf(listOf("g")).map { it.result.isSuccess } shouldBe listOf(true, true)
+    }
 })
 
+private const val SPEC_FILE = "TransformationExtSpec.kt"
+
+private enum class Color { RED }
+
+private data class User(val id: Int)
+
+private class Repo
+
+private data class Holder(val repo: Repo)
+
+private class ThrowingToString {
+    override fun toString(): String = error("x")
+}
+
+private class CyclicToString {
+    override fun toString(): String = "$this"
+}
+
+private fun same(value: Int): Int = value
+
+/** Номер строки, следующей за вызовом. Кадры: сама функция, её синтетический `access$`, вызвавшая лямбда. */
+private fun nextLine(): Int = Throwable().stackTrace[2].lineNumber + 1
+
+private fun RanTest.firstFrame(): String? =
+    result.errorOrNull?.stackTrace?.first()?.let { "${it.fileName}:${it.lineNumber}" }
+
 private val DEFAULT_NAMES = listOf(
-    "transformation to String",
-    "transformation String to String",
-    "transformation String and String to String",
-    "transformation String and String and String to String",
-    "transformation String and String and String and String to String",
-    "transformation String and String and String and String and String to String",
-    "transformation String and String and String and String and String and String to String",
-    "transformation String and String and String and String and String and String and String to String",
-    "transformation String and String and String and String and String and String and String and String to String",
+    "expected <empty string>",
+    "\"1\" -> \"1\"",
+    "(\"1\", \"2\") -> \"12\"",
+    "(\"1\", \"2\", \"3\") -> \"123\"",
+    "(\"1\", \"2\", \"3\", \"4\") -> \"1234\"",
+    "(\"1\", \"2\", \"3\", \"4\", \"5\") -> \"12345\"",
+    "(\"1\", \"2\", \"3\", \"4\", \"5\", \"6\") -> \"123456\"",
+    "(\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\") -> \"1234567\"",
+    "(\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\") -> \"12345678\"",
 )
 
 /** Все формы с 0–8 входами: конкатенация в ожидании заодно проверяет порядок входов. */
