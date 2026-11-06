@@ -1,86 +1,97 @@
 package io.github.nakulov.kotestkit.transformation
 
 import io.github.nakulov.kotestkit.TestOptions
+import io.github.nakulov.kotestkit.callSite
+import io.github.nakulov.kotestkit.displayValue
 import io.kotest.core.factory.TestFactory
 import io.kotest.core.spec.style.stringSpec
 import io.kotest.core.test.TestScope
 import io.kotest.matchers.shouldBe
-import kotlin.reflect.KClass
 
-@PublishedApi
+/** Имя по умолчанию: `expected 3`, `"ab" -> 99`, `("a", 1, <null>) -> 0`. */
+internal fun transformationName(expectedResult: Any?, vararg inputs: Any?): String {
+    val expected = displayValue(expectedResult)
+    return when (inputs.size) {
+        0 -> "expected $expected"
+        1 -> "${displayValue(inputs.single())} -> $expected"
+        else -> inputs.joinToString(", ", "(", ")") { displayValue(it) } + " -> $expected"
+    }
+}
+
+/** Ставит место вызова первым в стек только при несовпадении: падения блока автора и так ведут к своей строке. */
+internal fun <Result> checkResult(actual: Result, expectedResult: Result, site: StackTraceElement) {
+    try {
+        actual shouldBe expectedResult
+    } catch (e: AssertionError) {
+        e.stackTrace = arrayOf(site) + e.stackTrace
+        throw e
+    }
+}
+
 internal fun <Result> transformationTestFactory(
     expectedResult: Result,
-    resultType: KClass<*>,
     options: TestOptions,
     transformBlock: suspend TestScope.() -> Result,
 ): TestFactory {
+    val site = callSite()
     return stringSpec {
-        val testName = options.name ?: "transformation to ${resultType.simpleName}"
+        val testName = options.name ?: transformationName(expectedResult)
         testName.config(this, options.config) {
-            transformBlock(this) shouldBe expectedResult
+            checkResult(transformBlock(this), expectedResult, site)
         }
     }
 }
 
-@PublishedApi
 internal fun <Result, Input> transformationTestFactory(
     expectedResult: Result,
-    resultType: KClass<*>,
     input: Input,
     options: TestOptions,
     transformBlock: suspend TestScope.(Input) -> Result,
 ): TestFactory {
+    val site = callSite()
     return stringSpec {
-        val testName = options.name ?: "transformation ${input.className} to ${resultType.simpleName}"
+        val testName = options.name ?: transformationName(expectedResult, input)
         testName.config(this, options.config) {
-            transformBlock(this, input) shouldBe expectedResult
+            checkResult(transformBlock(this, input), expectedResult, site)
         }
     }
 }
 
-@PublishedApi
 internal fun <Result, Input1, Input2> transformationTestFactory(
     expectedResult: Result,
-    resultType: KClass<*>,
     input1: Input1,
     input2: Input2,
     options: TestOptions,
     transformBlock: suspend TestScope.(Input1, Input2) -> Result,
 ): TestFactory {
+    val site = callSite()
     return stringSpec {
-        val inputs = listOf(input1.className, input2.className)
-            .joinToString(" and ")
-        val testName = options.name ?: "transformation $inputs to ${resultType.simpleName}"
+        val testName = options.name ?: transformationName(expectedResult, input1, input2)
         testName.config(this, options.config) {
-            transformBlock(this, input1, input2) shouldBe expectedResult
+            checkResult(transformBlock(this, input1, input2), expectedResult, site)
         }
     }
 }
 
-@PublishedApi
 internal fun <Result, Input1, Input2, Input3> transformationTestFactory(
     expectedResult: Result,
-    resultType: KClass<*>,
     input1: Input1,
     input2: Input2,
     input3: Input3,
     options: TestOptions,
     transformBlock: suspend TestScope.(Input1, Input2, Input3) -> Result,
 ): TestFactory {
+    val site = callSite()
     return stringSpec {
-        val inputs = listOf(input1.className, input2.className, input3.className)
-            .joinToString(" and ")
-        val testName = options.name ?: "transformation $inputs to ${resultType.simpleName}"
+        val testName = options.name ?: transformationName(expectedResult, input1, input2, input3)
         testName.config(this, options.config) {
-            transformBlock(this, input1, input2, input3) shouldBe expectedResult
+            checkResult(transformBlock(this, input1, input2, input3), expectedResult, site)
         }
     }
 }
 
-@PublishedApi
 internal fun <Result, Input1, Input2, Input3, Input4> transformationTestFactory(
     expectedResult: Result,
-    resultType: KClass<*>,
     input1: Input1,
     input2: Input2,
     input3: Input3,
@@ -88,20 +99,17 @@ internal fun <Result, Input1, Input2, Input3, Input4> transformationTestFactory(
     options: TestOptions,
     transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4) -> Result,
 ): TestFactory {
+    val site = callSite()
     return stringSpec {
-        val inputs = listOf(input1.className, input2.className, input3.className, input4.className)
-            .joinToString(" and ")
-        val testName = options.name ?: "transformation $inputs to ${resultType.simpleName}"
+        val testName = options.name ?: transformationName(expectedResult, input1, input2, input3, input4)
         testName.config(this, options.config) {
-            transformBlock(this, input1, input2, input3, input4) shouldBe expectedResult
+            checkResult(transformBlock(this, input1, input2, input3, input4), expectedResult, site)
         }
     }
 }
 
-@PublishedApi
 internal fun <Result, Input1, Input2, Input3, Input4, Input5> transformationTestFactory(
     expectedResult: Result,
-    resultType: KClass<*>,
     input1: Input1,
     input2: Input2,
     input3: Input3,
@@ -110,25 +118,17 @@ internal fun <Result, Input1, Input2, Input3, Input4, Input5> transformationTest
     options: TestOptions,
     transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4, Input5) -> Result,
 ): TestFactory {
+    val site = callSite()
     return stringSpec {
-        val inputs = listOf(
-            input1.className,
-            input2.className,
-            input3.className,
-            input4.className,
-            input5.className
-        ).joinToString(" and ")
-        val testName = options.name ?: "transformation $inputs to ${resultType.simpleName}"
+        val testName = options.name ?: transformationName(expectedResult, input1, input2, input3, input4, input5)
         testName.config(this, options.config) {
-            transformBlock(this, input1, input2, input3, input4, input5) shouldBe expectedResult
+            checkResult(transformBlock(this, input1, input2, input3, input4, input5), expectedResult, site)
         }
     }
 }
 
-@PublishedApi
 internal fun <Result, Input1, Input2, Input3, Input4, Input5, Input6> transformationTestFactory(
     expectedResult: Result,
-    resultType: KClass<*>,
     input1: Input1,
     input2: Input2,
     input3: Input3,
@@ -138,26 +138,17 @@ internal fun <Result, Input1, Input2, Input3, Input4, Input5, Input6> transforma
     options: TestOptions,
     transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4, Input5, Input6) -> Result,
 ): TestFactory {
+    val site = callSite()
     return stringSpec {
-        val inputs = listOf(
-            input1.className,
-            input2.className,
-            input3.className,
-            input4.className,
-            input5.className,
-            input6.className
-        ).joinToString(" and ")
-        val testName = options.name ?: "transformation $inputs to ${resultType.simpleName}"
+        val testName = options.name ?: transformationName(expectedResult, input1, input2, input3, input4, input5, input6)
         testName.config(this, options.config) {
-            transformBlock(this, input1, input2, input3, input4, input5, input6) shouldBe expectedResult
+            checkResult(transformBlock(this, input1, input2, input3, input4, input5, input6), expectedResult, site)
         }
     }
 }
 
-@PublishedApi
 internal fun <Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7> transformationTestFactory(
     expectedResult: Result,
-    resultType: KClass<*>,
     input1: Input1,
     input2: Input2,
     input3: Input3,
@@ -168,27 +159,17 @@ internal fun <Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7> tr
     options: TestOptions,
     transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4, Input5, Input6, Input7) -> Result,
 ): TestFactory {
+    val site = callSite()
     return stringSpec {
-        val inputs = listOf(
-            input1.className,
-            input2.className,
-            input3.className,
-            input4.className,
-            input5.className,
-            input6.className,
-            input7.className
-        ).joinToString(" and ")
-        val testName = options.name ?: "transformation $inputs to ${resultType.simpleName}"
+        val testName = options.name ?: transformationName(expectedResult, input1, input2, input3, input4, input5, input6, input7)
         testName.config(this, options.config) {
-            transformBlock(this, input1, input2, input3, input4, input5, input6, input7) shouldBe expectedResult
+            checkResult(transformBlock(this, input1, input2, input3, input4, input5, input6, input7), expectedResult, site)
         }
     }
 }
 
-@PublishedApi
 internal fun <Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7, Input8> transformationTestFactory(
     expectedResult: Result,
-    resultType: KClass<*>,
     input1: Input1,
     input2: Input2,
     input3: Input3,
@@ -200,20 +181,11 @@ internal fun <Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7, In
     options: TestOptions,
     transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4, Input5, Input6, Input7, Input8) -> Result,
 ): TestFactory {
+    val site = callSite()
     return stringSpec {
-        val inputs = listOf(
-            input1.className,
-            input2.className,
-            input3.className,
-            input4.className,
-            input5.className,
-            input6.className,
-            input7.className,
-            input8.className
-        ).joinToString(" and ")
-        val testName = options.name ?: "transformation $inputs to ${resultType.simpleName}"
+        val testName = options.name ?: transformationName(expectedResult, input1, input2, input3, input4, input5, input6, input7, input8)
         testName.config(this, options.config) {
-            transformBlock(this, input1, input2, input3, input4, input5, input6, input7, input8) shouldBe expectedResult
+            checkResult(transformBlock(this, input1, input2, input3, input4, input5, input6, input7, input8), expectedResult, site)
         }
     }
 }

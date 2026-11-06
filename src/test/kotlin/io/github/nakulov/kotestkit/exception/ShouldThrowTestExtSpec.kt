@@ -40,9 +40,9 @@ class ShouldThrowTestExtSpec : StringSpec({
         }
 
         run.tests.map { it.name } shouldBe listOf(
-            "should throw IllegalStateException",
-            "should throw IllegalStateException with message \"x\"",
-            "should throw IllegalStateException exactly",
+            "throws IllegalStateException",
+            "throws IllegalStateException: \"x\"",
+            "throws exactly IllegalStateException",
         )
         run.tests.map { it.result.isSuccess } shouldBe List(3) { true }
     }
@@ -83,9 +83,9 @@ class ShouldThrowTestExtSpec : StringSpec({
         }
 
         run.tests.map { it.name } shouldBe listOf(
-            "should throw IllegalStateException",
-            "should throw IllegalStateException with message \"x\"",
-            "should throw IllegalStateException exactly",
+            "throws IllegalStateException",
+            "throws IllegalStateException: \"x\"",
+            "throws exactly IllegalStateException",
         )
         run.tests.map { it.config?.blockingTest } shouldBe List(3) { true }
     }
@@ -196,8 +196,8 @@ class ShouldThrowTestExtSpec : StringSpec({
 
         val tests = run.childrenOf(listOf("c"))
         tests.map { it.name } shouldBe listOf(
-            "should throw IllegalStateException",
-            "should throw IllegalStateException with message \"x\"",
+            "throws IllegalStateException",
+            "throws IllegalStateException: \"x\"",
         )
         tests.map { it.result.isSuccess } shouldBe listOf(true, true)
     }
@@ -226,9 +226,9 @@ class ShouldThrowTestExtSpec : StringSpec({
         BEHAVIOR_CONTAINERS.forEach { path ->
             val tests = run.childrenOf(path)
             tests.map { it.name } shouldBe listOf(
-                "should throw IllegalStateException",
-                "should throw IllegalStateException with message \"x\"",
-                "should throw IllegalStateException exactly",
+                "throws IllegalStateException",
+                "throws IllegalStateException: \"x\"",
+                "throws exactly IllegalStateException",
             )
             tests.map { it.result.isSuccess } shouldBe List(3) { true }
             tests.map { it.type } shouldBe List(3) { TestType.Test }
@@ -321,10 +321,67 @@ class ShouldThrowTestExtSpec : StringSpec({
 
         runs.forEach { run ->
             val test = run.childrenOf(listOf("c")).single()
-            test.name shouldBe "should throw IllegalStateException"
+            test.name shouldBe "throws IllegalStateException"
             test.result.isSuccess shouldBe true
             test.type shouldBe TestType.Test
             test.prefix shouldBe null
         }
     }
+
+    "имя по умолчанию: сообщение показывается как значение и обрезается по лимиту" {
+        val message = "m".repeat(100)
+
+        val run = runStringSpec {
+            shouldThrowWithMessageTest<IllegalStateException>("boom") { error("boom") }
+            shouldThrowWithMessageTest<IllegalStateException>("") { error("") }
+            shouldThrowWithMessageTest<IllegalStateException>(message) { error(message) }
+        }
+
+        run.tests.map { it.name } shouldBe listOf(
+            "throws IllegalStateException: \"boom\"",
+            "throws IllegalStateException: <empty string>",
+            "throws IllegalStateException: \"${"m".repeat(39)}…",
+        )
+    }
+
+    "брошен другой тип, блок в одну строку: строка броска есть в cause" {
+        val lines = mutableListOf<Int>()
+
+        val run = runBehaviorSpec {
+            lines += nextLine()
+            shouldThrowTest<IllegalStateException> { throw Exception("x") }
+            lines += nextLine()
+            shouldThrowExactlyTest<IllegalStateException>(TestOptions("exactly")) { throw Exception("x") }
+            Given("g") {
+                lines += nextLine()
+                shouldThrowTest<IllegalStateException> { throw Exception("x") }
+                lines += nextLine()
+                shouldThrowExactlyTest<IllegalStateException>(TestOptions("exactly")) { throw Exception("x") }
+            }
+        }
+
+        val frames = run.tests.filter { it.type == TestType.Test }.map { test ->
+            test.result.errorOrNull?.cause?.stackTrace?.first()?.let { "${it.fileName}:${it.lineNumber}" }
+        }
+        frames shouldBe lines.map { "$SPEC_FILE:$it" }
+    }
+
+    "блок бросил AssertionError: настоящая строка в блоке идёт первой" {
+        val lines = mutableListOf<Int>()
+
+        val run = runStringSpec {
+            shouldThrowTest<IllegalStateException> {
+                lines += nextLine()
+                1 shouldBe 2
+            }
+        }
+
+        val frame = run.tests.single().result.errorOrNull?.stackTrace?.first()
+        "${frame?.fileName}:${frame?.lineNumber}" shouldBe "$SPEC_FILE:${lines.single()}"
+    }
 })
+
+private const val SPEC_FILE = "ShouldThrowTestExtSpec.kt"
+
+/** Номер строки, следующей за вызовом. Кадры: сама функция, её синтетический `access$`, вызвавшая лямбда. */
+private fun nextLine(): Int = Throwable().stackTrace[2].lineNumber + 1

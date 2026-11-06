@@ -2,6 +2,7 @@ package io.github.nakulov.kotestkit.exception
 
 import io.github.nakulov.kotestkit.INSIDE_TEST_MESSAGE
 import io.github.nakulov.kotestkit.TestOptions
+import io.github.nakulov.kotestkit.displayValue
 import io.github.nakulov.kotestkit.registerLeaf
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
@@ -17,7 +18,7 @@ inline fun <reified T : Throwable> AbstractSpec.shouldThrowTest(
     val caller = ShouldThrowCaller { throwBlock ->
         shouldThrow<T> { throwBlock() }
     }
-    val defaultTestName = "should throw ${T::class.simpleName}"
+    val defaultTestName = "throws ${T::class.simpleName}"
     this.include(shouldThrowFactory(defaultTestName, options, caller, block))
 }
 
@@ -29,7 +30,7 @@ inline fun <reified T : Throwable> AbstractSpec.shouldThrowWithMessageTest(
     val caller = ShouldThrowCaller { throwBlock ->
         shouldThrowWithMessage<T>(message) { throwBlock() }
     }
-    val defaultTestName = "should throw ${T::class.simpleName} with message \"$message\""
+    val defaultTestName = "throws ${T::class.simpleName}: ${displayValue(message)}"
     this.include(shouldThrowFactory(defaultTestName, options, caller, block))
 }
 
@@ -40,7 +41,7 @@ inline fun <reified T : Throwable> AbstractSpec.shouldThrowExactlyTest(
     val caller = ShouldThrowCaller { throwBlock ->
         shouldThrowExactly<T> { throwBlock() }
     }
-    val defaultTestName = "should throw ${T::class.simpleName} exactly"
+    val defaultTestName = "throws exactly ${T::class.simpleName}"
     this.include(shouldThrowFactory(defaultTestName, options, caller, block))
 }
 
@@ -48,7 +49,7 @@ suspend inline fun <reified T : Throwable> ContainerScope.shouldThrowTest(
     options: TestOptions = TestOptions(),
     noinline block: suspend () -> Any?,
 ) {
-    registerLeaf("should throw ${T::class.simpleName}", options) {
+    registerLeaf("throws ${T::class.simpleName}", options) {
         shouldThrow<T> { block() }
     }
 }
@@ -58,7 +59,7 @@ suspend inline fun <reified T : Throwable> ContainerScope.shouldThrowWithMessage
     options: TestOptions = TestOptions(),
     noinline block: suspend () -> Any?,
 ) {
-    registerLeaf("should throw ${T::class.simpleName} with message \"$message\"", options) {
+    registerLeaf("throws ${T::class.simpleName}: ${displayValue(message)}", options) {
         shouldThrowWithMessage<T>(message) { block() }
     }
 }
@@ -67,7 +68,7 @@ suspend inline fun <reified T : Throwable> ContainerScope.shouldThrowExactlyTest
     options: TestOptions = TestOptions(),
     noinline block: suspend () -> Any?,
 ) {
-    registerLeaf("should throw ${T::class.simpleName} exactly", options) {
+    registerLeaf("throws exactly ${T::class.simpleName}", options) {
         shouldThrowExactly<T> { block() }
     }
 }
