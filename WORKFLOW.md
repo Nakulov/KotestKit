@@ -43,15 +43,15 @@ Priority на доске (P0, P1, P2).
 ## Команды репозитория
 
 ```sh
-cd skotest && ./gradlew build   # сборка и тесты
+./gradlew build   # сборка и тесты
 ```
 
 ## Где что лежит
 
-| Что                 | Где                                                             |
-|---------------------|-----------------------------------------------------------------|
-| Код библиотеки      | `skotest/src/main/kotlin/`                                      |
-| Сборка и версии     | `skotest/build.gradle.kts`, `skotest/gradle/libs.versions.toml` |
-| Скиллы процесса     | `.claude/skills/groom`, `take`                                  |
-| Работа с доской     | `tools/board.sh`                                                |
+| Что                 | Где                                             |
+|---------------------|-------------------------------------------------|
+| Код библиотеки      | `src/main/kotlin/`                              |
+| Сборка и версии     | `build.gradle.kts`, `gradle/libs.versions.toml` |
+| Скиллы процесса     | `.claude/skills/groom`, `take`                  |
+| Работа с доской     | `tools/board.sh`                                |
 | Шаблоны задачи и PR | `.github/`                                                      |

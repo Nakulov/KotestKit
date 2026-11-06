@@ -28,10 +28,7 @@ publishing {
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/Nakulov/SKotest")
-            credentials {
-                username = providers.gradleProperty("gpr.user").get()
-                password = providers.gradleProperty("gpr.key").get()
-            }
+            credentials(PasswordCredentials::class)
         }
     }
 }
