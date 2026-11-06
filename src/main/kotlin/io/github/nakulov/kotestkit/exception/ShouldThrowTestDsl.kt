@@ -33,18 +33,18 @@ data class ShouldThrowTestDsl(
         specDsl.include(
             shouldThrowFactory(
                 ShouldThrowTestConfig(
-                    testName ?: defaultTestName,
-                    enabled,
-                    invocations,
-                    tags,
-                    timeout,
-                    extensions,
-                    enabledIf,
-                    invocationTimeout,
-                    severity,
-                    enabledOrReasonIf,
-                    blockingTest,
-                    coroutineTestScope
+                    testName = testName ?: defaultTestName,
+                    enabled = enabled,
+                    invocations = invocations,
+                    tags = tags,
+                    timeout = timeout,
+                    extensions = extensions,
+                    enabledIf = enabledIf,
+                    invocationTimeout = invocationTimeout,
+                    severity = severity,
+                    enabledOrReasonIf = enabledOrReasonIf,
+                    blockingTest = blockingTest,
+                    coroutineTestScope = coroutineTestScope,
                 ),
                 caller,
                 throwBlock

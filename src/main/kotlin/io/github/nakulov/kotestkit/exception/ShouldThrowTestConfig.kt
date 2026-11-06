@@ -19,8 +19,8 @@ data class ShouldThrowTestConfig(
     private val invocationTimeout: Duration? = null,
     private val severity: TestCaseSeverityLevel? = null,
     private val enabledOrReasonIf: EnabledOrReasonIf? = null,
-    private val coroutineDebugProbes: Boolean? = null,
     private val blockingTest: Boolean? = null,
+    private val coroutineTestScope: Boolean? = null,
 ) {
 
     val kotestConfig = TestConfig(
@@ -33,7 +33,7 @@ data class ShouldThrowTestConfig(
         invocationTimeout = invocationTimeout,
         invocations = invocations,
         severity = severity,
-        coroutineDebugProbes = coroutineDebugProbes,
         blockingTest = blockingTest,
+        coroutineTestScope = coroutineTestScope,
     )
 }

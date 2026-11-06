@@ -47,8 +47,8 @@ data class TransformationTestDsl<Result>(
                     invocationTimeout = invocationTimeout,
                     severity = severity,
                     enabledOrReasonIf = enabledOrReasonIf,
-                    coroutineDebugProbes = blockingTest,
-                    blockingTest = coroutineTestScope,
+                    blockingTest = blockingTest,
+                    coroutineTestScope = coroutineTestScope,
                 ),
                 transformBlock = transformBlock
             )
@@ -105,8 +105,8 @@ class TransformationTestDsl1<Result, Input>(
                     invocationTimeout = invocationTimeout,
                     severity = severity,
                     enabledOrReasonIf = enabledOrReasonIf,
-                    coroutineDebugProbes = blockingTest,
-                    blockingTest = coroutineTestScope,
+                    blockingTest = blockingTest,
+                    coroutineTestScope = coroutineTestScope,
                 ),
                 transformBlock = transformBlock
             )
@@ -151,8 +151,8 @@ data class TransformationTestDsl2<Result, Input1, Input2>(
                     invocationTimeout = invocationTimeout,
                     severity = severity,
                     enabledOrReasonIf = enabledOrReasonIf,
-                    coroutineDebugProbes = blockingTest,
-                    blockingTest = coroutineTestScope
+                    blockingTest = blockingTest,
+                    coroutineTestScope = coroutineTestScope
                 ),
                 transformBlock = transformBlock
             )
@@ -198,8 +198,8 @@ data class TransformationTestDsl3<Result, Input1, Input2, Input3>(
                     invocationTimeout = invocationTimeout,
                     severity = severity,
                     enabledOrReasonIf = enabledOrReasonIf,
-                    coroutineDebugProbes = blockingTest,
-                    blockingTest = coroutineTestScope
+                    blockingTest = blockingTest,
+                    coroutineTestScope = coroutineTestScope
                 ),
                 transformBlock = transformBlock
             )
@@ -246,8 +246,8 @@ data class TransformationTestDsl4<Result, Input1, Input2, Input3, Input4>(
                     invocationTimeout = invocationTimeout,
                     severity = severity,
                     enabledOrReasonIf = enabledOrReasonIf,
-                    coroutineDebugProbes = blockingTest,
-                    blockingTest = coroutineTestScope
+                    blockingTest = blockingTest,
+                    coroutineTestScope = coroutineTestScope
                 ),
                 transformBlock = transformBlock
             )
@@ -295,8 +295,8 @@ data class TransformationTestDsl5<Result, Input1, Input2, Input3, Input4, Input5
                     invocationTimeout = invocationTimeout,
                     severity = severity,
                     enabledOrReasonIf = enabledOrReasonIf,
-                    coroutineDebugProbes = blockingTest,
-                    blockingTest = coroutineTestScope
+                    blockingTest = blockingTest,
+                    coroutineTestScope = coroutineTestScope
                 ),
                 transformBlock = transformBlock
             )
@@ -345,8 +345,8 @@ data class TransformationTestDsl6<Result, Input1, Input2, Input3, Input4, Input5
                     invocationTimeout = invocationTimeout,
                     severity = severity,
                     enabledOrReasonIf = enabledOrReasonIf,
-                    coroutineDebugProbes = blockingTest,
-                    blockingTest = coroutineTestScope
+                    blockingTest = blockingTest,
+                    coroutineTestScope = coroutineTestScope
                 ),
                 transformBlock = transformBlock
             )
@@ -396,8 +396,8 @@ data class TransformationTestDsl7<Result, Input1, Input2, Input3, Input4, Input5
                     invocationTimeout = invocationTimeout,
                     severity = severity,
                     enabledOrReasonIf = enabledOrReasonIf,
-                    coroutineDebugProbes = blockingTest,
-                    blockingTest = coroutineTestScope
+                    blockingTest = blockingTest,
+                    coroutineTestScope = coroutineTestScope
                 ),
                 transformBlock = transformBlock
             )
@@ -448,8 +448,8 @@ data class TransformationTestDsl8<Result, Input1, Input2, Input3, Input4, Input5
                     invocationTimeout = invocationTimeout,
                     severity = severity,
                     enabledOrReasonIf = enabledOrReasonIf,
-                    coroutineDebugProbes = blockingTest,
-                    blockingTest = coroutineTestScope
+                    blockingTest = blockingTest,
+                    coroutineTestScope = coroutineTestScope
                 ),
                 transformBlock = transformBlock
             )

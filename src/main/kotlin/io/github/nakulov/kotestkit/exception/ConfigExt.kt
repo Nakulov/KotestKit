@@ -8,21 +8,5 @@ fun String.config(
     config: ShouldThrowTestConfig,
     test: suspend TestScope.() -> Unit
 ) {
-    with(scope) {
-        with(config.kotestConfig) {
-            config(
-                enabled = enabled,
-                invocations = invocations,
-                tags = tags,
-                timeout = timeout,
-                enabledIf = enabledIf,
-                invocationTimeout = invocationTimeout,
-                severity = severity,
-                enabledOrReasonIf = enabledOrReasonIf,
-                coroutineDebugProbes = coroutineDebugProbes,
-                blockingTest = blockingTest,
-                test = test
-            )
-        }
-    }
+    with(scope) { config(config.kotestConfig, test) }
 }
