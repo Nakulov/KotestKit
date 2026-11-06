@@ -1,7 +1,10 @@
 package io.github.nakulov.kotestkit.exception
 
+import io.github.nakulov.kotestkit.TestOptions
+import io.github.nakulov.kotestkit.case
 import io.github.nakulov.kotestkit.testing.runBehaviorSpec
 import io.github.nakulov.kotestkit.testing.runStringSpec
+import io.github.nakulov.kotestkit.withData
 import io.kotest.core.NamedTag
 import io.kotest.core.extensions.TestCaseExtension
 import io.kotest.core.spec.style.StringSpec
@@ -10,6 +13,7 @@ import io.kotest.core.test.EnabledIf
 import io.kotest.core.test.EnabledOrReasonIf
 import io.kotest.core.test.TestCase
 import io.kotest.core.test.TestCaseSeverityLevel
+import io.kotest.core.test.config.TestConfig
 import io.kotest.engine.test.TestResult
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeSameInstanceAs
@@ -17,35 +21,75 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+private const val THEN_NAME = "should verify result"
+
 class ShouldThrowTestExtSpec : StringSpec({
-    "StringSpec: каждый вызов регистрирует по одному успешному тесту" {
+    "StringSpec, без options: каждый вызов регистрирует один успешный тест с именем по умолчанию" {
         val run = runStringSpec {
             shouldThrowTest<IllegalStateException> { error("x") }
-            shouldThrowTest<IllegalStateException>().config(testName = "builder") { error("x") }
             shouldThrowWithMessageTest<IllegalStateException>("x") { error("x") }
             shouldThrowExactlyTest<IllegalStateException> { error("x") }
         }
 
-        run.tests.map { it.result.isSuccess } shouldBe listOf(true, true, true, true)
+        run.tests.map { it.name } shouldBe listOf(
+            "should throw IllegalStateException",
+            "should throw IllegalStateException with message \"x\"",
+            "should throw IllegalStateException exactly",
+        )
+        run.tests.map { it.result.isSuccess } shouldBe List(3) { true }
     }
 
-    "BehaviorSpec: каждый вызов регистрирует по одному успешному тесту" {
+    "BehaviorSpec, без options: каждый вызов регистрирует один успешный тест" {
         val run = runBehaviorSpec {
             shouldThrowTest<IllegalStateException> { error("x") }
-            shouldThrowTest<IllegalStateException>().config(testName = "builder") { error("x") }
             shouldThrowWithMessageTest<IllegalStateException>("x") { error("x") }
             shouldThrowExactlyTest<IllegalStateException> { error("x") }
         }
 
-        run.tests.map { it.result.isSuccess } shouldBe listOf(true, true, true, true)
+        run.tests.map { it.result.isSuccess } shouldBe List(3) { true }
+    }
+
+    "options.name и blockingTest доходят до Kotest, тест один и успешный" {
+        fun options(name: String) = TestOptions(name, TestConfig(blockingTest = true))
+
+        val run = runStringSpec {
+            shouldThrowTest<IllegalStateException>(options("0")) { error("x") }
+            shouldThrowWithMessageTest<IllegalStateException>("x", options("1")) { error("x") }
+            shouldThrowExactlyTest<IllegalStateException>(options("2")) { error("x") }
+        }
+
+        run.tests.map { it.name } shouldBe listOf("0", "1", "2")
+        run.tests.map { it.result.isSuccess } shouldBe List(3) { true }
+        run.tests.map { it.config?.blockingTest } shouldBe List(3) { true }
+        run.tests.map { it.config?.coroutineTestScope } shouldBe List(3) { null }
+        run.tests.map { it.config?.coroutineDebugProbes } shouldBe List(3) { null }
+    }
+
+    "TestOptions без имени оставляет имя по умолчанию" {
+        val options = TestOptions(config = TestConfig(blockingTest = true))
+
+        val run = runStringSpec {
+            shouldThrowTest<IllegalStateException>(options) { error("x") }
+            shouldThrowWithMessageTest<IllegalStateException>("x", options) { error("x") }
+            shouldThrowExactlyTest<IllegalStateException>(options) { error("x") }
+        }
+
+        run.tests.map { it.name } shouldBe listOf(
+            "should throw IllegalStateException",
+            "should throw IllegalStateException with message \"x\"",
+            "should throw IllegalStateException exactly",
+        )
+        run.tests.map { it.config?.blockingTest } shouldBe List(3) { true }
     }
 
     "StringSpec: тест падает, если исключения нет" {
         val run = runStringSpec {
             shouldThrowTest<IllegalStateException> { }
+            shouldThrowWithMessageTest<IllegalStateException>("x") { }
+            shouldThrowExactlyTest<IllegalStateException> { }
         }
 
-        run.tests.single().result.isFailure shouldBe true
+        run.tests.map { it.result.isFailure } shouldBe List(3) { true }
     }
 
     "BehaviorSpec: тест падает, если исключения нет" {
@@ -56,20 +100,11 @@ class ShouldThrowTestExtSpec : StringSpec({
         run.tests.single().result.isFailure shouldBe true
     }
 
-    "blockingTest доходит до Kotest как написан" {
-        val run = runStringSpec {
-            shouldThrowTest<IllegalStateException>().config(blockingTest = true) { error("x") }
-        }
-
-        val config = run.tests.single().config
-        config?.blockingTest shouldBe true
-        config?.coroutineTestScope shouldBe null
-        config?.coroutineDebugProbes shouldBe null
-    }
-
     "coroutineTestScope доходит до Kotest как написан" {
         val run = runStringSpec {
-            shouldThrowTest<IllegalStateException>().config(coroutineTestScope = true) { error("x") }
+            shouldThrowTest<IllegalStateException>(TestOptions(config = TestConfig(coroutineTestScope = true))) {
+                error("x")
+            }
         }
 
         val config = run.tests.single().config
@@ -78,22 +113,26 @@ class ShouldThrowTestExtSpec : StringSpec({
         config?.coroutineDebugProbes shouldBe null
     }
 
-    "все настройки .config доходят до Kotest как написаны" {
+    "все настройки options доходят до Kotest как написаны" {
         val tag = NamedTag("tag")
         val enabledIf: EnabledIf = { true }
         val enabledOrReasonIf: EnabledOrReasonIf = { Enabled.enabled }
 
         val run = runStringSpec {
-            shouldThrowTest<IllegalStateException>().config(
-                testName = "name",
-                enabled = true,
-                invocations = 2,
-                tags = setOf(tag),
-                timeout = 1.minutes,
-                enabledIf = enabledIf,
-                invocationTimeout = 30.seconds,
-                severity = TestCaseSeverityLevel.CRITICAL,
-                enabledOrReasonIf = enabledOrReasonIf,
+            shouldThrowTest<IllegalStateException>(
+                TestOptions(
+                    "name",
+                    TestConfig(
+                        enabled = true,
+                        invocations = 2,
+                        tags = setOf(tag),
+                        timeout = 1.minutes,
+                        enabledIf = enabledIf,
+                        invocationTimeout = 30.seconds,
+                        severity = TestCaseSeverityLevel.CRITICAL,
+                        enabledOrReasonIf = enabledOrReasonIf,
+                    ),
+                ),
             ) { error("x") }
         }
 
@@ -112,7 +151,7 @@ class ShouldThrowTestExtSpec : StringSpec({
 
     "enabled = false отключает тест" {
         val run = runStringSpec {
-            shouldThrowTest<IllegalStateException>().config(enabled = false) { error("x") }
+            shouldThrowTest<IllegalStateException>(TestOptions(config = TestConfig(enabled = false))) { error("x") }
         }
 
         val test = run.tests.single()
@@ -130,10 +169,34 @@ class ShouldThrowTestExtSpec : StringSpec({
         }
 
         val run = runStringSpec {
-            shouldThrowTest<IllegalStateException>().config(extensions = listOf(extension)) { error("x") }
+            shouldThrowTest<IllegalStateException>(TestOptions(config = TestConfig(extensions = listOf(extension)))) {
+                error("x")
+            }
         }
 
         run.tests.single().config?.extensions shouldBe listOf(extension)
         calls.get() shouldBe 1
+    }
+
+    "withData: shouldThrowTest и shouldThrowWithMessageTest создают успешный Then, когда блок бросает" {
+        val run = runBehaviorSpec {
+            withData(nameFn = { "c" }, case(1)) { _ ->
+                shouldThrowTest<IllegalStateException> { error("x") }
+                shouldThrowWithMessageTest<IllegalStateException>("x") { error("x") }
+            }
+        }
+
+        run.tests.filter { it.name == THEN_NAME }.map { it.result.isSuccess } shouldBe listOf(true, true)
+    }
+
+    "withData: shouldThrowTest и shouldThrowWithMessageTest роняют Then, когда блок не бросает" {
+        val run = runBehaviorSpec {
+            withData(nameFn = { "c" }, case(1)) { _ ->
+                shouldThrowTest<IllegalStateException> { }
+                shouldThrowWithMessageTest<IllegalStateException>("x") { }
+            }
+        }
+
+        run.tests.filter { it.name == THEN_NAME }.map { it.result.isFailure } shouldBe listOf(true, true)
     }
 })
