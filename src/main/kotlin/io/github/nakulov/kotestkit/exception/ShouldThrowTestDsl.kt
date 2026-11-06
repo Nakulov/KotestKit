@@ -2,7 +2,7 @@ package io.github.nakulov.kotestkit.exception
 
 import io.kotest.core.Tag
 import io.kotest.core.extensions.TestCaseExtension
-import io.kotest.core.spec.DslDrivenSpec
+import io.kotest.core.spec.AbstractSpec
 import io.kotest.core.test.EnabledIf
 import io.kotest.core.test.EnabledOrReasonIf
 import io.kotest.core.test.TestCaseSeverityLevel
@@ -10,7 +10,7 @@ import kotlin.time.Duration
 
 
 data class ShouldThrowTestDsl(
-    val specDsl: DslDrivenSpec,
+    val specDsl: AbstractSpec,
     val caller: ShouldThrowCaller,
     val defaultTestName: String
 ) {

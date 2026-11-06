@@ -1,10 +1,10 @@
 package io.github.nakulov.kotestkit.transformation
 
-import io.kotest.core.spec.DslDrivenSpec
+import io.kotest.core.spec.AbstractSpec
 import io.kotest.core.spec.style.scopes.BehaviorSpecContextContainerScope
 import io.kotest.core.test.TestScope
 
-inline fun <reified Result> DslDrivenSpec.transformationTest(
+inline fun <reified Result> AbstractSpec.transformationTest(
     expectedResult: Result,
 ): TransformationTestDsl<Result> {
     return transformationTest(lazyOf(expectedResult))
@@ -16,14 +16,14 @@ inline fun <reified Result> BehaviorSpecContextContainerScope.transformationTest
     return transformationTest(lazyOf(expectedResult))
 }
 
-inline fun <reified Result, Input> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input> AbstractSpec.transformationTest(
     expectedResult: Result,
     input: Input,
 ): TransformationTestDsl1<Result, Input> {
     return transformationTest(lazyOf(expectedResult), input)
 }
 
-inline fun <reified Result, Input1, Input2> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2> AbstractSpec.transformationTest(
     expectedResult: Result,
     input1: Input1,
     input2: Input2,
@@ -31,7 +31,7 @@ inline fun <reified Result, Input1, Input2> DslDrivenSpec.transformationTest(
     return transformationTest(lazyOf(expectedResult), input1, input2)
 }
 
-inline fun <reified Result, Input1, Input2, Input3> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3> AbstractSpec.transformationTest(
     expectedResult: Result,
     input1: Input1,
     input2: Input2,
@@ -40,7 +40,7 @@ inline fun <reified Result, Input1, Input2, Input3> DslDrivenSpec.transformation
     return transformationTest(lazyOf(expectedResult), input1, input2, input3)
 }
 
-inline fun <reified Result, Input1, Input2, Input3, Input4> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3, Input4> AbstractSpec.transformationTest(
     expectedResult: Result,
     input1: Input1,
     input2: Input2,
@@ -50,7 +50,7 @@ inline fun <reified Result, Input1, Input2, Input3, Input4> DslDrivenSpec.transf
     return transformationTest(lazyOf(expectedResult), input1, input2, input3, input4)
 }
 
-inline fun <reified Result, Input1, Input2, Input3, Input4, Input5> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3, Input4, Input5> AbstractSpec.transformationTest(
     expectedResult: Result,
     input1: Input1,
     input2: Input2,
@@ -61,7 +61,7 @@ inline fun <reified Result, Input1, Input2, Input3, Input4, Input5> DslDrivenSpe
     return transformationTest(lazyOf(expectedResult), input1, input2, input3, input4, input5)
 }
 
-inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6> AbstractSpec.transformationTest(
     expectedResult: Result,
     input1: Input1,
     input2: Input2,
@@ -73,7 +73,7 @@ inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6> DslD
     return transformationTest(lazyOf(expectedResult), input1, input2, input3, input4, input5, input6)
 }
 
-inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7> AbstractSpec.transformationTest(
     expectedResult: Result,
     input1: Input1,
     input2: Input2,
@@ -86,7 +86,7 @@ inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Inpu
     return transformationTest(lazyOf(expectedResult), input1, input2, input3, input4, input5, input6, input7)
 }
 
-inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7, Input8> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7, Input8> AbstractSpec.transformationTest(
     expectedResult: Result,
     input1: Input1,
     input2: Input2,
@@ -100,7 +100,7 @@ inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Inpu
     return transformationTest(lazyOf(expectedResult), input1, input2, input3, input4, input5, input6, input7, input8)
 }
 
-inline fun <reified Result> DslDrivenSpec.transformationTest(
+inline fun <reified Result> AbstractSpec.transformationTest(
     expectedResult: Result,
     noinline transformBlock: suspend TestScope.() -> Result,
 ) {
@@ -115,7 +115,7 @@ suspend inline fun <reified Result> BehaviorSpecContextContainerScope.transforma
 }
 
 
-inline fun <reified Result, Input> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input> AbstractSpec.transformationTest(
     expectedResult: Result,
     input: Input,
     noinline transformBlock: suspend TestScope.(Input) -> Result,
@@ -123,7 +123,7 @@ inline fun <reified Result, Input> DslDrivenSpec.transformationTest(
     transformationTest(expectedResult, input).config(transformBlock = transformBlock)
 }
 
-inline fun <reified Result, Input1, Input2> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2> AbstractSpec.transformationTest(
     expectedResult: Result,
     input1: Input1,
     input2: Input2,
@@ -132,7 +132,7 @@ inline fun <reified Result, Input1, Input2> DslDrivenSpec.transformationTest(
     transformationTest(expectedResult, input1, input2).config(transformBlock = transformBlock)
 }
 
-inline fun <reified Result, Input1, Input2, Input3> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3> AbstractSpec.transformationTest(
     expectedResult: Result,
     input1: Input1,
     input2: Input2,
@@ -142,7 +142,7 @@ inline fun <reified Result, Input1, Input2, Input3> DslDrivenSpec.transformation
     transformationTest(expectedResult, input1, input2, input3).config(transformBlock = transformBlock)
 }
 
-inline fun <reified Result, Input1, Input2, Input3, Input4> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3, Input4> AbstractSpec.transformationTest(
     expectedResult: Result,
     input1: Input1,
     input2: Input2,
@@ -153,7 +153,7 @@ inline fun <reified Result, Input1, Input2, Input3, Input4> DslDrivenSpec.transf
     transformationTest(expectedResult, input1, input2, input3, input4).config(transformBlock = transformBlock)
 }
 
-inline fun <reified Result, Input1, Input2, Input3, Input4, Input5> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3, Input4, Input5> AbstractSpec.transformationTest(
     expectedResult: Result,
     input1: Input1,
     input2: Input2,
@@ -165,7 +165,7 @@ inline fun <reified Result, Input1, Input2, Input3, Input4, Input5> DslDrivenSpe
     transformationTest(expectedResult, input1, input2, input3, input4, input5).config(transformBlock = transformBlock)
 }
 
-inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7> AbstractSpec.transformationTest(
     expectedResult: Result,
     input1: Input1,
     input2: Input2,
@@ -188,7 +188,7 @@ inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Inpu
     ).config(transformBlock = transformBlock)
 }
 
-inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7, Input8> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7, Input8> AbstractSpec.transformationTest(
     expectedResult: Result,
     input1: Input1,
     input2: Input2,
@@ -205,7 +205,7 @@ inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Inpu
     )
 }
 
-inline fun <reified Result> DslDrivenSpec.transformationTest(
+inline fun <reified Result> AbstractSpec.transformationTest(
     expectedResultLazy: Lazy<Result>,
 ): TransformationTestDsl<Result> {
     return TransformationTestDsl(this, expectedResultLazy, Result::class)
@@ -218,14 +218,14 @@ inline fun <reified Result> BehaviorSpecContextContainerScope.transformationTest
 }
 
 
-inline fun <reified Result, Input> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input> AbstractSpec.transformationTest(
     expectedResultLazy: Lazy<Result>,
     input: Input,
 ): TransformationTestDsl1<Result, Input> {
     return TransformationTestDsl1(this, expectedResultLazy, Result::class, input)
 }
 
-inline fun <reified Result, Input1, Input2> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2> AbstractSpec.transformationTest(
     expectedResultLazy: Lazy<Result>,
     input1: Input1,
     input2: Input2,
@@ -233,7 +233,7 @@ inline fun <reified Result, Input1, Input2> DslDrivenSpec.transformationTest(
     return TransformationTestDsl2(this, expectedResultLazy, Result::class, input1, input2)
 }
 
-inline fun <reified Result, Input1, Input2, Input3> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3> AbstractSpec.transformationTest(
     expectedResultLazy: Lazy<Result>,
     input1: Input1,
     input2: Input2,
@@ -242,7 +242,7 @@ inline fun <reified Result, Input1, Input2, Input3> DslDrivenSpec.transformation
     return TransformationTestDsl3(this, expectedResultLazy, Result::class, input1, input2, input3)
 }
 
-inline fun <reified Result, Input1, Input2, Input3, Input4> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3, Input4> AbstractSpec.transformationTest(
     expectedResultLazy: Lazy<Result>,
     input1: Input1,
     input2: Input2,
@@ -252,7 +252,7 @@ inline fun <reified Result, Input1, Input2, Input3, Input4> DslDrivenSpec.transf
     return TransformationTestDsl4(this, expectedResultLazy, Result::class, input1, input2, input3, input4)
 }
 
-inline fun <reified Result, Input1, Input2, Input3, Input4, Input5> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3, Input4, Input5> AbstractSpec.transformationTest(
     expectedResultLazy: Lazy<Result>,
     input1: Input1,
     input2: Input2,
@@ -263,7 +263,7 @@ inline fun <reified Result, Input1, Input2, Input3, Input4, Input5> DslDrivenSpe
     return TransformationTestDsl5(this, expectedResultLazy, Result::class, input1, input2, input3, input4, input5)
 }
 
-inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6> AbstractSpec.transformationTest(
     expectedResultLazy: Lazy<Result>,
     input1: Input1,
     input2: Input2,
@@ -285,7 +285,7 @@ inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6> DslD
     )
 }
 
-inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7> AbstractSpec.transformationTest(
     expectedResultLazy: Lazy<Result>,
     input1: Input1,
     input2: Input2,
@@ -308,7 +308,7 @@ inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Inpu
     )
 }
 
-inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7, Input8> DslDrivenSpec.transformationTest(
+inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7, Input8> AbstractSpec.transformationTest(
     expectedResultLazy: Lazy<Result>,
     input1: Input1,
     input2: Input2,

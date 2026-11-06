@@ -2,7 +2,7 @@ package io.github.nakulov.kotestkit.transformation
 
 import io.kotest.core.Tag
 import io.kotest.core.extensions.TestCaseExtension
-import io.kotest.core.spec.DslDrivenSpec
+import io.kotest.core.spec.AbstractSpec
 import io.kotest.core.spec.style.scopes.BehaviorSpecContextContainerScope
 import io.kotest.core.test.EnabledIf
 import io.kotest.core.test.EnabledOrReasonIf
@@ -13,7 +13,7 @@ import kotlin.reflect.KClass
 import kotlin.time.Duration
 
 data class TransformationTestDsl<Result>(
-    val specDsl: DslDrivenSpec,
+    val specDsl: AbstractSpec,
     val expectedResultLazy: Lazy<Result>,
     val resultType: KClass<*>?,
 ) {
@@ -70,7 +70,7 @@ data class TransformationTestDslWithData<Result>(
 }
 
 class TransformationTestDsl1<Result, Input>(
-    val specDsl: DslDrivenSpec,
+    val specDsl: AbstractSpec,
     val expectedResultLazy: Lazy<Result>,
     val resultType: KClass<*>?,
     val input: Input
@@ -115,7 +115,7 @@ class TransformationTestDsl1<Result, Input>(
 }
 
 data class TransformationTestDsl2<Result, Input1, Input2>(
-    val specDsl: DslDrivenSpec,
+    val specDsl: AbstractSpec,
     val expectedResultLazy: Lazy<Result>,
     val resultType: KClass<*>?,
     val input1: Input1,
@@ -161,7 +161,7 @@ data class TransformationTestDsl2<Result, Input1, Input2>(
 }
 
 data class TransformationTestDsl3<Result, Input1, Input2, Input3>(
-    val specDsl: DslDrivenSpec,
+    val specDsl: AbstractSpec,
     val expectedResultLazy: Lazy<Result>,
     val resultType: KClass<*>?,
     val input1: Input1,
@@ -208,7 +208,7 @@ data class TransformationTestDsl3<Result, Input1, Input2, Input3>(
 }
 
 data class TransformationTestDsl4<Result, Input1, Input2, Input3, Input4>(
-    val specDsl: DslDrivenSpec,
+    val specDsl: AbstractSpec,
     val expectedResultLazy: Lazy<Result>,
     val resultType: KClass<*>?,
     val input1: Input1,
@@ -256,7 +256,7 @@ data class TransformationTestDsl4<Result, Input1, Input2, Input3, Input4>(
 }
 
 data class TransformationTestDsl5<Result, Input1, Input2, Input3, Input4, Input5>(
-    val specDsl: DslDrivenSpec,
+    val specDsl: AbstractSpec,
     val expectedResultLazy: Lazy<Result>,
     val resultType: KClass<*>?,
     val input1: Input1,
@@ -305,7 +305,7 @@ data class TransformationTestDsl5<Result, Input1, Input2, Input3, Input4, Input5
 }
 
 data class TransformationTestDsl6<Result, Input1, Input2, Input3, Input4, Input5, Input6>(
-    val specDsl: DslDrivenSpec,
+    val specDsl: AbstractSpec,
     val expectedResultLazy: Lazy<Result>,
     val resultType: KClass<*>?,
     val input1: Input1,
@@ -355,7 +355,7 @@ data class TransformationTestDsl6<Result, Input1, Input2, Input3, Input4, Input5
 }
 
 data class TransformationTestDsl7<Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7>(
-    val specDsl: DslDrivenSpec,
+    val specDsl: AbstractSpec,
     val expectedResultLazy: Lazy<Result>,
     val resultType: KClass<*>?,
     val input1: Input1,
@@ -406,7 +406,7 @@ data class TransformationTestDsl7<Result, Input1, Input2, Input3, Input4, Input5
 }
 
 data class TransformationTestDsl8<Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7, Input8>(
-    val specDsl: DslDrivenSpec,
+    val specDsl: AbstractSpec,
     val expectedResultLazy: Lazy<Result>,
     val resultType: KClass<*>?,
     val input1: Input1,

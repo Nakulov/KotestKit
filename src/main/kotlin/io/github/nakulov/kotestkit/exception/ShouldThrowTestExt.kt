@@ -5,10 +5,10 @@ import io.github.nakulov.kotestkit.`when`
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.assertions.throwables.shouldThrowWithMessage
-import io.kotest.core.spec.DslDrivenSpec
+import io.kotest.core.spec.AbstractSpec
 import io.kotest.core.spec.style.scopes.BehaviorSpecContextContainerScope
 
-inline fun <reified T : Throwable> DslDrivenSpec.shouldThrowTest(
+inline fun <reified T : Throwable> AbstractSpec.shouldThrowTest(
     noinline block: suspend () -> Any?
 ) {
     val caller = ShouldThrowCaller { throwBlock ->
@@ -38,7 +38,7 @@ suspend inline fun <reified T : Throwable> BehaviorSpecContextContainerScope.sho
     }
 }
 
-inline fun <reified T : Throwable> DslDrivenSpec.shouldThrowTest(): ShouldThrowTestDsl {
+inline fun <reified T : Throwable> AbstractSpec.shouldThrowTest(): ShouldThrowTestDsl {
     val caller = ShouldThrowCaller { throwBlock ->
         shouldThrow<T> { throwBlock() }
     }
@@ -46,7 +46,7 @@ inline fun <reified T : Throwable> DslDrivenSpec.shouldThrowTest(): ShouldThrowT
     return ShouldThrowTestDsl(this, caller, defaultTestName)
 }
 
-inline fun <reified T : Throwable> DslDrivenSpec.shouldThrowWithMessageTest(
+inline fun <reified T : Throwable> AbstractSpec.shouldThrowWithMessageTest(
     message: String,
     noinline block: suspend () -> Any?
 ) {
@@ -78,7 +78,7 @@ suspend inline fun <reified T : Throwable> BehaviorSpecContextContainerScope.sho
     }
 }
 
-inline fun <reified T : Throwable> DslDrivenSpec.shouldThrowWithMessageTest(
+inline fun <reified T : Throwable> AbstractSpec.shouldThrowWithMessageTest(
     message: String
 ): ShouldThrowTestDsl {
     val caller = ShouldThrowCaller { throwBlock ->
@@ -88,7 +88,7 @@ inline fun <reified T : Throwable> DslDrivenSpec.shouldThrowWithMessageTest(
     return ShouldThrowTestDsl(this, caller, defaultTestName)
 }
 
-inline fun <reified T : Throwable> DslDrivenSpec.shouldThrowExactlyTest(
+inline fun <reified T : Throwable> AbstractSpec.shouldThrowExactlyTest(
     noinline block: suspend () -> Any?
 ) {
     val caller = ShouldThrowCaller { throwBlock ->
@@ -104,7 +104,7 @@ inline fun <reified T : Throwable> DslDrivenSpec.shouldThrowExactlyTest(
     )
 }
 
-inline fun <reified T : Throwable> DslDrivenSpec.shouldThrowExactlyTest(): ShouldThrowTestDsl {
+inline fun <reified T : Throwable> AbstractSpec.shouldThrowExactlyTest(): ShouldThrowTestDsl {
     val caller = ShouldThrowCaller { throwBlock ->
         shouldThrowExactly<T> { throwBlock() }
     }
