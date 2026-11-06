@@ -165,6 +165,21 @@ inline fun <reified Result, Input1, Input2, Input3, Input4, Input5> AbstractSpec
     transformationTest(expectedResult, input1, input2, input3, input4, input5).config(transformBlock = transformBlock)
 }
 
+inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6> AbstractSpec.transformationTest(
+    expectedResult: Result,
+    input1: Input1,
+    input2: Input2,
+    input3: Input3,
+    input4: Input4,
+    input5: Input5,
+    input6: Input6,
+    noinline transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4, Input5, Input6) -> Result,
+) {
+    transformationTest(expectedResult, input1, input2, input3, input4, input5, input6).config(
+        transformBlock = transformBlock
+    )
+}
+
 inline fun <reified Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7> AbstractSpec.transformationTest(
     expectedResult: Result,
     input1: Input1,
