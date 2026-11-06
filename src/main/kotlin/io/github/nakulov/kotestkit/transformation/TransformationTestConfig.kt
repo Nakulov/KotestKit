@@ -1,4 +1,4 @@
-package com.simple.kotest.transformation
+package io.github.nakulov.kotestkit.transformation
 
 import io.kotest.core.Tag
 import io.kotest.core.extensions.Extension

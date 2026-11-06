@@ -1,2 +1,2 @@
-# SKotest
+# KotestKit
 Simple kotest extensions

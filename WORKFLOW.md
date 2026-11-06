@@ -31,7 +31,7 @@
 
 ## Доска
 
-[SKotest](https://github.com/users/Nakulov/projects/9): Backlog → Groomed → In progress → In review → Done.
+[KotestKit](https://github.com/users/Nakulov/projects/9): Backlog → Groomed → In progress → In review → Done.
 
 ```sh
 tools/board.sh status <N> groomed              # backlog, groomed, in-progress, in-review, done

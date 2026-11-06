@@ -1,4 +1,4 @@
-package com.simple.kotest.exception
+package io.github.nakulov.kotestkit.exception
 
 import io.kotest.core.Tag
 import io.kotest.core.extensions.Extension

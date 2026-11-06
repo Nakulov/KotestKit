@@ -10,7 +10,7 @@
 set -u
 
 owner=Nakulov
-name=SKotest
+name=KotestKit
 repo=$owner/$name
 number=9
 project=PVT_kwHOASpeKc4BqaGf
