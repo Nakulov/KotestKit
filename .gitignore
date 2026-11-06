@@ -2,7 +2,6 @@
 .gradle/
 .idea/
 build/
-skotest/.gradle/
 *.properties
 *.class
 
@@ -17,6 +16,7 @@ skotest/.gradle/
 
 # Package Files #
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
 *.war
 *.nar
 *.ear
