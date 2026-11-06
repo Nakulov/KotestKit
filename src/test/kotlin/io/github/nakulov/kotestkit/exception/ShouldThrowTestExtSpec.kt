@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package io.github.nakulov.kotestkit.exception
 
 import io.github.nakulov.kotestkit.TestOptions
@@ -24,10 +26,14 @@ import io.kotest.core.test.TestCase
 import io.kotest.core.test.TestCaseSeverityLevel
 import io.kotest.core.test.TestType
 import io.kotest.core.test.config.TestConfig
+import io.kotest.core.test.testCoroutineScheduler
 import io.kotest.engine.test.TestResult
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeSameInstanceAs
 import java.util.concurrent.atomic.AtomicInteger
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -378,6 +384,60 @@ class ShouldThrowTestExtSpec : StringSpec({
 
         val frame = run.tests.single().result.errorOrNull?.stackTrace?.first()
         "${frame?.fileName}:${frame?.lineNumber}" shouldBe "$SPEC_FILE:${lines.single()}"
+    }
+
+    "контейнер: testCase в блоке — сам тест, а не контейнер" {
+        val names = mutableListOf<String>()
+
+        val run = runFunSpec {
+            context("c") {
+                shouldThrowTest<IllegalStateException> {
+                    names += testCase.name.name
+                    error("x")
+                }
+                shouldThrowWithMessageTest<IllegalStateException>("x") {
+                    names += testCase.name.name
+                    error("x")
+                }
+                shouldThrowExactlyTest<IllegalStateException> {
+                    names += testCase.name.name
+                    error("x")
+                }
+            }
+        }
+
+        run.childrenOf(listOf("c")).map { it.result.isSuccess } shouldBe List(3) { true }
+        names shouldBe listOf(
+            "throws IllegalStateException",
+            "throws IllegalStateException: \"x\"",
+            "throws exactly IllegalStateException",
+        )
+    }
+
+    "корень: testCoroutineScheduler работает при coroutineTestScope = true" {
+        val options = TestOptions(config = TestConfig(coroutineTestScope = true))
+        val times = mutableListOf<Long>()
+
+        val run = runStringSpec {
+            shouldThrowTest<IllegalStateException>(options) {
+                delay(1.hours)
+                times += testCoroutineScheduler.currentTime
+                error("x")
+            }
+            shouldThrowWithMessageTest<IllegalStateException>("x", options) {
+                delay(1.hours)
+                times += testCoroutineScheduler.currentTime
+                error("x")
+            }
+            shouldThrowExactlyTest<IllegalStateException>(options) {
+                delay(1.hours)
+                times += testCoroutineScheduler.currentTime
+                error("x")
+            }
+        }
+
+        run.tests.map { it.result.isSuccess } shouldBe List(3) { true }
+        times shouldBe List(3) { 1.hours.inWholeMilliseconds }
     }
 })
 

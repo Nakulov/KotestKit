@@ -2,8 +2,6 @@ package io.github.nakulov.kotestkit.transformation
 
 import io.github.nakulov.kotestkit.INSIDE_TEST_MESSAGE
 import io.github.nakulov.kotestkit.TestOptions
-import io.github.nakulov.kotestkit.callSite
-import io.github.nakulov.kotestkit.registerLeaf
 import io.kotest.core.spec.AbstractSpec
 import io.kotest.core.spec.style.scopes.ContainerScope
 import io.kotest.core.test.TestScope
@@ -13,7 +11,7 @@ fun <Result> AbstractSpec.transformationTest(
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.() -> Result,
 ) {
-    include(transformationTestFactory(expectedResult, options, transformBlock))
+    add(returnTest(expectedResult, options) { transformBlock() })
 }
 
 fun <Result, Input> AbstractSpec.transformationTest(
@@ -22,7 +20,7 @@ fun <Result, Input> AbstractSpec.transformationTest(
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input) -> Result,
 ) {
-    include(transformationTestFactory(expectedResult, input, options, transformBlock))
+    add(returnTest(expectedResult, options, input) { transformBlock(input) })
 }
 
 fun <Result, Input1, Input2> AbstractSpec.transformationTest(
@@ -32,7 +30,7 @@ fun <Result, Input1, Input2> AbstractSpec.transformationTest(
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input1, Input2) -> Result,
 ) {
-    include(transformationTestFactory(expectedResult, input1, input2, options, transformBlock))
+    add(returnTest(expectedResult, options, input1, input2) { transformBlock(input1, input2) })
 }
 
 fun <Result, Input1, Input2, Input3> AbstractSpec.transformationTest(
@@ -43,7 +41,7 @@ fun <Result, Input1, Input2, Input3> AbstractSpec.transformationTest(
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input1, Input2, Input3) -> Result,
 ) {
-    include(transformationTestFactory(expectedResult, input1, input2, input3, options, transformBlock))
+    add(returnTest(expectedResult, options, input1, input2, input3) { transformBlock(input1, input2, input3) })
 }
 
 fun <Result, Input1, Input2, Input3, Input4> AbstractSpec.transformationTest(
@@ -55,9 +53,7 @@ fun <Result, Input1, Input2, Input3, Input4> AbstractSpec.transformationTest(
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4) -> Result,
 ) {
-    include(
-        transformationTestFactory(expectedResult, input1, input2, input3, input4, options, transformBlock)
-    )
+    add(returnTest(expectedResult, options, input1, input2, input3, input4) { transformBlock(input1, input2, input3, input4) })
 }
 
 fun <Result, Input1, Input2, Input3, Input4, Input5> AbstractSpec.transformationTest(
@@ -70,18 +66,7 @@ fun <Result, Input1, Input2, Input3, Input4, Input5> AbstractSpec.transformation
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4, Input5) -> Result,
 ) {
-    include(
-        transformationTestFactory(
-            expectedResult,
-            input1,
-            input2,
-            input3,
-            input4,
-            input5,
-            options,
-            transformBlock,
-        )
-    )
+    add(returnTest(expectedResult, options, input1, input2, input3, input4, input5) { transformBlock(input1, input2, input3, input4, input5) })
 }
 
 fun <Result, Input1, Input2, Input3, Input4, Input5, Input6> AbstractSpec.transformationTest(
@@ -95,19 +80,7 @@ fun <Result, Input1, Input2, Input3, Input4, Input5, Input6> AbstractSpec.transf
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4, Input5, Input6) -> Result,
 ) {
-    include(
-        transformationTestFactory(
-            expectedResult,
-            input1,
-            input2,
-            input3,
-            input4,
-            input5,
-            input6,
-            options,
-            transformBlock,
-        )
-    )
+    add(returnTest(expectedResult, options, input1, input2, input3, input4, input5, input6) { transformBlock(input1, input2, input3, input4, input5, input6) })
 }
 
 fun <Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7> AbstractSpec.transformationTest(
@@ -122,20 +95,7 @@ fun <Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7> AbstractSpe
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4, Input5, Input6, Input7) -> Result,
 ) {
-    include(
-        transformationTestFactory(
-            expectedResult,
-            input1,
-            input2,
-            input3,
-            input4,
-            input5,
-            input6,
-            input7,
-            options,
-            transformBlock,
-        )
-    )
+    add(returnTest(expectedResult, options, input1, input2, input3, input4, input5, input6, input7) { transformBlock(input1, input2, input3, input4, input5, input6, input7) })
 }
 
 fun <Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7, Input8> AbstractSpec.transformationTest(
@@ -151,21 +111,7 @@ fun <Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7, Input8> Abs
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4, Input5, Input6, Input7, Input8) -> Result,
 ) {
-    include(
-        transformationTestFactory(
-            expectedResult,
-            input1,
-            input2,
-            input3,
-            input4,
-            input5,
-            input6,
-            input7,
-            input8,
-            options,
-            transformBlock,
-        )
-    )
+    add(returnTest(expectedResult, options, input1, input2, input3, input4, input5, input6, input7, input8) { transformBlock(input1, input2, input3, input4, input5, input6, input7, input8) })
 }
 
 suspend fun <Result> ContainerScope.transformationTest(
@@ -173,10 +119,7 @@ suspend fun <Result> ContainerScope.transformationTest(
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.() -> Result,
 ) {
-    val site = callSite()
-    registerLeaf(transformationName(expectedResult), options) {
-        checkResult(transformBlock(this), expectedResult, site)
-    }
+    registerTest(returnTest(expectedResult, options) { transformBlock() })
 }
 
 suspend fun <Result, Input> ContainerScope.transformationTest(
@@ -185,10 +128,7 @@ suspend fun <Result, Input> ContainerScope.transformationTest(
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input) -> Result,
 ) {
-    val site = callSite()
-    registerLeaf(transformationName(expectedResult, input), options) {
-        checkResult(transformBlock(this, input), expectedResult, site)
-    }
+    registerTest(returnTest(expectedResult, options, input) { transformBlock(input) })
 }
 
 suspend fun <Result, Input1, Input2> ContainerScope.transformationTest(
@@ -198,10 +138,7 @@ suspend fun <Result, Input1, Input2> ContainerScope.transformationTest(
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input1, Input2) -> Result,
 ) {
-    val site = callSite()
-    registerLeaf(transformationName(expectedResult, input1, input2), options) {
-        checkResult(transformBlock(this, input1, input2), expectedResult, site)
-    }
+    registerTest(returnTest(expectedResult, options, input1, input2) { transformBlock(input1, input2) })
 }
 
 suspend fun <Result, Input1, Input2, Input3> ContainerScope.transformationTest(
@@ -212,10 +149,7 @@ suspend fun <Result, Input1, Input2, Input3> ContainerScope.transformationTest(
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input1, Input2, Input3) -> Result,
 ) {
-    val site = callSite()
-    registerLeaf(transformationName(expectedResult, input1, input2, input3), options) {
-        checkResult(transformBlock(this, input1, input2, input3), expectedResult, site)
-    }
+    registerTest(returnTest(expectedResult, options, input1, input2, input3) { transformBlock(input1, input2, input3) })
 }
 
 suspend fun <Result, Input1, Input2, Input3, Input4> ContainerScope.transformationTest(
@@ -227,10 +161,7 @@ suspend fun <Result, Input1, Input2, Input3, Input4> ContainerScope.transformati
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4) -> Result,
 ) {
-    val site = callSite()
-    registerLeaf(transformationName(expectedResult, input1, input2, input3, input4), options) {
-        checkResult(transformBlock(this, input1, input2, input3, input4), expectedResult, site)
-    }
+    registerTest(returnTest(expectedResult, options, input1, input2, input3, input4) { transformBlock(input1, input2, input3, input4) })
 }
 
 suspend fun <Result, Input1, Input2, Input3, Input4, Input5> ContainerScope.transformationTest(
@@ -243,10 +174,7 @@ suspend fun <Result, Input1, Input2, Input3, Input4, Input5> ContainerScope.tran
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4, Input5) -> Result,
 ) {
-    val site = callSite()
-    registerLeaf(transformationName(expectedResult, input1, input2, input3, input4, input5), options) {
-        checkResult(transformBlock(this, input1, input2, input3, input4, input5), expectedResult, site)
-    }
+    registerTest(returnTest(expectedResult, options, input1, input2, input3, input4, input5) { transformBlock(input1, input2, input3, input4, input5) })
 }
 
 suspend fun <Result, Input1, Input2, Input3, Input4, Input5, Input6> ContainerScope.transformationTest(
@@ -260,10 +188,7 @@ suspend fun <Result, Input1, Input2, Input3, Input4, Input5, Input6> ContainerSc
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4, Input5, Input6) -> Result,
 ) {
-    val site = callSite()
-    registerLeaf(transformationName(expectedResult, input1, input2, input3, input4, input5, input6), options) {
-        checkResult(transformBlock(this, input1, input2, input3, input4, input5, input6), expectedResult, site)
-    }
+    registerTest(returnTest(expectedResult, options, input1, input2, input3, input4, input5, input6) { transformBlock(input1, input2, input3, input4, input5, input6) })
 }
 
 suspend fun <Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7> ContainerScope.transformationTest(
@@ -278,10 +203,7 @@ suspend fun <Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7> Con
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4, Input5, Input6, Input7) -> Result,
 ) {
-    val site = callSite()
-    registerLeaf(transformationName(expectedResult, input1, input2, input3, input4, input5, input6, input7), options) {
-        checkResult(transformBlock(this, input1, input2, input3, input4, input5, input6, input7), expectedResult, site)
-    }
+    registerTest(returnTest(expectedResult, options, input1, input2, input3, input4, input5, input6, input7) { transformBlock(input1, input2, input3, input4, input5, input6, input7) })
 }
 
 suspend fun <Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7, Input8> ContainerScope.transformationTest(
@@ -297,10 +219,7 @@ suspend fun <Result, Input1, Input2, Input3, Input4, Input5, Input6, Input7, Inp
     options: TestOptions = TestOptions(),
     transformBlock: suspend TestScope.(Input1, Input2, Input3, Input4, Input5, Input6, Input7, Input8) -> Result,
 ) {
-    val site = callSite()
-    registerLeaf(transformationName(expectedResult, input1, input2, input3, input4, input5, input6, input7, input8), options) {
-        checkResult(transformBlock(this, input1, input2, input3, input4, input5, input6, input7, input8), expectedResult, site)
-    }
+    registerTest(returnTest(expectedResult, options, input1, input2, input3, input4, input5, input6, input7, input8) { transformBlock(input1, input2, input3, input4, input5, input6, input7, input8) })
 }
 
 @Deprecated(INSIDE_TEST_MESSAGE, level = DeprecationLevel.ERROR)
