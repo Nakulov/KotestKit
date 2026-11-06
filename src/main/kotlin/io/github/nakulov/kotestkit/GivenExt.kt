@@ -2,7 +2,10 @@ package io.github.nakulov.kotestkit
 
 import io.kotest.core.spec.style.scopes.BehaviorSpecGivenContainerScope
 import io.kotest.core.spec.style.scopes.BehaviorSpecRootScope
+import io.kotest.core.test.TestScope
 import io.kotest.datatest.withGivens
+
+private const val WITH_GIVENS_MESSAGE = "withGivens работает только в корне спеки"
 
 fun <A1> BehaviorSpecRootScope.withGivens(
     nameFn: (Case1<A1>) -> String,
@@ -102,3 +105,59 @@ fun <A1, A2, A3, A4, A5, A6, A7, A8> BehaviorSpecRootScope.withGivens(
         )
     }
 }
+
+@Deprecated(WITH_GIVENS_MESSAGE, level = DeprecationLevel.ERROR)
+fun <A1> TestScope.withGivens(
+    nameFn: (Case1<A1>) -> String,
+    vararg cases: Case1<A1>,
+    test: suspend TestScope.(arg1: A1) -> Unit
+): Unit = error("unreachable")
+
+@Deprecated(WITH_GIVENS_MESSAGE, level = DeprecationLevel.ERROR)
+fun <A1, A2> TestScope.withGivens(
+    nameFn: (Case2<A1, A2>) -> String,
+    vararg cases: Case2<A1, A2>,
+    test: suspend TestScope.(arg1: A1, arg2: A2) -> Unit
+): Unit = error("unreachable")
+
+@Deprecated(WITH_GIVENS_MESSAGE, level = DeprecationLevel.ERROR)
+fun <A1, A2, A3> TestScope.withGivens(
+    nameFn: (Case3<A1, A2, A3>) -> String,
+    vararg cases: Case3<A1, A2, A3>,
+    test: suspend TestScope.(arg1: A1, arg2: A2, arg3: A3) -> Unit
+): Unit = error("unreachable")
+
+@Deprecated(WITH_GIVENS_MESSAGE, level = DeprecationLevel.ERROR)
+fun <A1, A2, A3, A4> TestScope.withGivens(
+    nameFn: (Case4<A1, A2, A3, A4>) -> String,
+    vararg cases: Case4<A1, A2, A3, A4>,
+    test: suspend TestScope.(arg1: A1, arg2: A2, arg3: A3, arg4: A4) -> Unit
+): Unit = error("unreachable")
+
+@Deprecated(WITH_GIVENS_MESSAGE, level = DeprecationLevel.ERROR)
+fun <A1, A2, A3, A4, A5> TestScope.withGivens(
+    nameFn: (Case5<A1, A2, A3, A4, A5>) -> String,
+    vararg cases: Case5<A1, A2, A3, A4, A5>,
+    test: suspend TestScope.(arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) -> Unit
+): Unit = error("unreachable")
+
+@Deprecated(WITH_GIVENS_MESSAGE, level = DeprecationLevel.ERROR)
+fun <A1, A2, A3, A4, A5, A6> TestScope.withGivens(
+    nameFn: (Case6<A1, A2, A3, A4, A5, A6>) -> String,
+    vararg cases: Case6<A1, A2, A3, A4, A5, A6>,
+    test: suspend TestScope.(arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, arg6: A6) -> Unit
+): Unit = error("unreachable")
+
+@Deprecated(WITH_GIVENS_MESSAGE, level = DeprecationLevel.ERROR)
+fun <A1, A2, A3, A4, A5, A6, A7> TestScope.withGivens(
+    nameFn: (Case7<A1, A2, A3, A4, A5, A6, A7>) -> String,
+    vararg cases: Case7<A1, A2, A3, A4, A5, A6, A7>,
+    test: suspend TestScope.(arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, arg6: A6, arg7: A7) -> Unit
+): Unit = error("unreachable")
+
+@Deprecated(WITH_GIVENS_MESSAGE, level = DeprecationLevel.ERROR)
+fun <A1, A2, A3, A4, A5, A6, A7, A8> TestScope.withGivens(
+    nameFn: (Case8<A1, A2, A3, A4, A5, A6, A7, A8>) -> String,
+    vararg cases: Case8<A1, A2, A3, A4, A5, A6, A7, A8>,
+    test: suspend TestScope.(arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, arg6: A6, arg7: A7, arg8: A8) -> Unit
+): Unit = error("unreachable")

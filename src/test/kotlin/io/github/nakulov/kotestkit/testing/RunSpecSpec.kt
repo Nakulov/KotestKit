@@ -1,6 +1,7 @@
 package io.github.nakulov.kotestkit.testing
 
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.core.test.TestType
 import io.kotest.engine.test.TestResult
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
@@ -59,6 +60,32 @@ class RunSpecSpec : StringSpec({
             listOf("g"),
         )
         run.tests.map { it.result.isSuccess } shouldBe listOf(false, true, true)
+    }
+
+    "префикс и тип узла: у Given и Then свои, у теста StringSpec префикса нет" {
+        val behavior = runBehaviorSpec {
+            given("g") {
+                `when`("w") {
+                    then("t") { }
+                }
+            }
+        }
+        val string = runStringSpec { "t" { } }
+
+        behavior.tests.map { it.prefix } shouldBe listOf("Then: ", "When: ", "Given: ")
+        behavior.tests.map { it.type } shouldBe listOf(TestType.Test, TestType.Container, TestType.Container)
+        string.tests.single().prefix.shouldBeNull()
+        string.tests.single().type shouldBe TestType.Test
+    }
+
+    "отключённый тест: префикс и тип тоже в отчёте" {
+        val run = runBehaviorSpec {
+            xgiven("g") { }
+        }
+
+        val test = run.tests.single()
+        test.prefix shouldBe "Given: "
+        test.type shouldBe TestType.Container
     }
 
     "исключение в теле спеки: тестов нет, ошибка в specError" {

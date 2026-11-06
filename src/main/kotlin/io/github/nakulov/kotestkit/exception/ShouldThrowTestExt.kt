@@ -1,13 +1,14 @@
 package io.github.nakulov.kotestkit.exception
 
+import io.github.nakulov.kotestkit.INSIDE_TEST_MESSAGE
 import io.github.nakulov.kotestkit.TestOptions
-import io.github.nakulov.kotestkit.then
-import io.github.nakulov.kotestkit.`when`
+import io.github.nakulov.kotestkit.registerLeaf
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.assertions.throwables.shouldThrowWithMessage
 import io.kotest.core.spec.AbstractSpec
-import io.kotest.core.spec.style.scopes.BehaviorSpecContextContainerScope
+import io.kotest.core.spec.style.scopes.ContainerScope
+import io.kotest.core.test.TestScope
 
 inline fun <reified T : Throwable> AbstractSpec.shouldThrowTest(
     options: TestOptions = TestOptions(),
@@ -18,20 +19,6 @@ inline fun <reified T : Throwable> AbstractSpec.shouldThrowTest(
     }
     val defaultTestName = "should throw ${T::class.simpleName}"
     this.include(shouldThrowFactory(defaultTestName, options, caller, block))
-}
-
-suspend inline fun <reified T : Throwable> BehaviorSpecContextContainerScope.shouldThrowTest(
-    noinline block: suspend () -> Any?
-) {
-    given("should throw ${T::class.simpleName}") {
-        `when` {
-            then {
-                shouldThrow<T> {
-                    block()
-                }
-            }
-        }
-    }
 }
 
 inline fun <reified T : Throwable> AbstractSpec.shouldThrowWithMessageTest(
@@ -46,21 +33,6 @@ inline fun <reified T : Throwable> AbstractSpec.shouldThrowWithMessageTest(
     this.include(shouldThrowFactory(defaultTestName, options, caller, block))
 }
 
-suspend inline fun <reified T : Throwable> BehaviorSpecContextContainerScope.shouldThrowWithMessageTest(
-    message: String,
-    noinline block: suspend () -> Any?
-) {
-    given("should throw ${T::class.simpleName} with message \"$message\"") {
-        `when` {
-            then {
-                shouldThrowWithMessage<T>(message) {
-                    block()
-                }
-            }
-        }
-    }
-}
-
 inline fun <reified T : Throwable> AbstractSpec.shouldThrowExactlyTest(
     options: TestOptions = TestOptions(),
     noinline block: suspend () -> Any?,
@@ -71,3 +43,50 @@ inline fun <reified T : Throwable> AbstractSpec.shouldThrowExactlyTest(
     val defaultTestName = "should throw ${T::class.simpleName} exactly"
     this.include(shouldThrowFactory(defaultTestName, options, caller, block))
 }
+
+suspend inline fun <reified T : Throwable> ContainerScope.shouldThrowTest(
+    options: TestOptions = TestOptions(),
+    noinline block: suspend () -> Any?,
+) {
+    registerLeaf("should throw ${T::class.simpleName}", options) {
+        shouldThrow<T> { block() }
+    }
+}
+
+suspend inline fun <reified T : Throwable> ContainerScope.shouldThrowWithMessageTest(
+    message: String,
+    options: TestOptions = TestOptions(),
+    noinline block: suspend () -> Any?,
+) {
+    registerLeaf("should throw ${T::class.simpleName} with message \"$message\"", options) {
+        shouldThrowWithMessage<T>(message) { block() }
+    }
+}
+
+suspend inline fun <reified T : Throwable> ContainerScope.shouldThrowExactlyTest(
+    options: TestOptions = TestOptions(),
+    noinline block: suspend () -> Any?,
+) {
+    registerLeaf("should throw ${T::class.simpleName} exactly", options) {
+        shouldThrowExactly<T> { block() }
+    }
+}
+
+@Deprecated(INSIDE_TEST_MESSAGE, level = DeprecationLevel.ERROR)
+fun <T : Throwable> TestScope.shouldThrowTest(
+    options: TestOptions = TestOptions(),
+    block: suspend () -> Any?,
+): Unit = error("unreachable")
+
+@Deprecated(INSIDE_TEST_MESSAGE, level = DeprecationLevel.ERROR)
+fun <T : Throwable> TestScope.shouldThrowWithMessageTest(
+    message: String,
+    options: TestOptions = TestOptions(),
+    block: suspend () -> Any?,
+): Unit = error("unreachable")
+
+@Deprecated(INSIDE_TEST_MESSAGE, level = DeprecationLevel.ERROR)
+fun <T : Throwable> TestScope.shouldThrowExactlyTest(
+    options: TestOptions = TestOptions(),
+    block: suspend () -> Any?,
+): Unit = error("unreachable")

@@ -11,15 +11,20 @@
   `TestOptions.kt`) своих спек не получают, они проверяются через публичные вызовы.
 - Тестовые данные, только если нужны, лежат в `<Имя>SpecData.kt`. Именованных классов-спек там нет: такой класс Kotest
   запустит как настоящий тест.
-- Что произошло при прогоне, проверяем через `runStringSpec` и `runBehaviorSpec`. Спеку для прогона описываем в их
-  лямбде, а не отдельным классом.
+- Что произошло при прогоне, проверяем через помощники `run<Стиль>Spec`, например `runStringSpec` и `runBehaviorSpec`.
+  Спеку для прогона описываем в их лямбде, а не отдельным классом.
 - Для бага сначала падающий тест. Зелёная спека без единого теста ничего не доказывает.
 
 ## Проверка прогона спеки
 
-`runStringSpec` и `runBehaviorSpec` из `src/test/kotlin/io/github/nakulov/kotestkit/testing/RunSpec.kt` прогоняют спеку
-из лямбды и возвращают отчёт: `tests` и `specError`. Сами они ничего не проверяют, проверки пишутся матчерами Kotest.
-Если сломался движок Kotest, помощник бросает его ошибку: такому отчёту нельзя верить.
+Помощники из `src/test/kotlin/io/github/nakulov/kotestkit/testing/RunSpec.kt` прогоняют спеку из лямбды и возвращают
+отчёт: `tests` и `specError`. Есть для каждого стиля: `runStringSpec`, `runBehaviorSpec`, `runFunSpec`, `runDescribeSpec`,
+`runFreeSpec`, `runWordSpec`, `runShouldSpec`, `runExpectSpec`, `runFeatureSpec`. Сами они ничего не проверяют, проверки
+пишутся матчерами Kotest. Если сломался движок Kotest, помощник бросает его ошибку: такому отчёту нельзя верить.
+
+У теста в отчёте есть `path`, `name`, `prefix` (префикс стиля, например `Given: `, иначе `null`), `type` (контейнер или
+конечный тест), `config` и `result`. `childrenOf(path)` отбирает прямых потомков контейнера, а `inEachContainer` выполняет
+блок в каждом контейнере `BehaviorSpec`; их пути лежат в `BEHAVIOR_CONTAINERS`.
 
 ```kotlin
 "вызов создаёт один успешный тест" {
