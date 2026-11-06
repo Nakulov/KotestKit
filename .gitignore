@@ -34,3 +34,6 @@ replay_pid*
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
+
+# macOS
+.DS_Store
