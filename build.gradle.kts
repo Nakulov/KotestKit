@@ -9,6 +9,8 @@ version = "1.0.3"
 dependencies {
     api(libs.kotest.runner.junit5)
     api(libs.kotest.assertions.core)
+
+    testImplementation(libs.kotlinx.coroutines.test)
 }
 
 kotlin {

@@ -318,6 +318,26 @@ class TransformationExtSpec : StringSpec({
         run.childrenOf(listOf("g")).map { it.result.isFailure } shouldBe List(9) { true }
     }
 
+    "контейнер, 0 и 1 вход: testCase в блоке — сам тест, а не контейнер" {
+        val names = mutableListOf<String>()
+
+        val run = runFunSpec {
+            context("c") {
+                transformationTest(0) {
+                    names += testCase.name.name
+                    0
+                }
+                transformationTest(1, 1) { a ->
+                    names += testCase.name.name
+                    a
+                }
+            }
+        }
+
+        run.childrenOf(listOf("c")).map { it.result.isSuccess } shouldBe listOf(true, true)
+        names shouldBe listOf("expected 0", "1 -> 1")
+    }
+
     "контейнер: падение проверки не отменяет следующую" {
         val run = runBehaviorSpec {
             Given("g") {
