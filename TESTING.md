@@ -5,7 +5,7 @@
 - Тесты пишутся только как спеки Kotest.
 - Внешние спеки на `StringSpec`. `BehaviorSpec` только там, где сама проверка касается Given/When/Then.
 - Спека соответствует файлу, где объявлен публичный вызов, пакет тот же: `ShouldReturnTestExt.kt` →
-  `ShouldReturnTestExtSpec.kt`, `DataExt.kt` → `DataExtSpec.kt`. Спека заводится, когда на файл появляются
+  `ShouldReturnTestExtSpec.kt`, `GivenExt.kt` → `GivenExtSpec.kt`. Спека заводится, когда на файл появляются
   первые тесты. Вызов вместе с `options` проверяется там же.
 - Файлы без вызовов для пользователя (настройки, например `TestOptions.kt`) своих спек не получают, они проверяются
   через публичные вызовы.

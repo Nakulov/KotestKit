@@ -3,7 +3,6 @@
 package io.github.nakulov.kotestkit.testing
 
 import io.github.nakulov.kotestkit.case
-import io.github.nakulov.kotestkit.withData
 import io.github.nakulov.kotestkit.withGivens
 import io.kotest.core.spec.SpecRef
 import io.kotest.core.spec.style.BehaviorSpec
@@ -61,7 +60,6 @@ internal suspend fun runFeatureSpec(body: FeatureSpec.() -> Unit): SpecRun =
 
 /** Пути контейнеров, которые создаёт [inEachContainer]. */
 internal val BEHAVIOR_CONTAINERS = listOf(
-    listOf("withData"),
     listOf("withGivens"),
     listOf("Context"),
     listOf("Given"),
@@ -70,7 +68,6 @@ internal val BEHAVIOR_CONTAINERS = listOf(
 
 /** Выполняет [body] в каждом контейнере `BehaviorSpec`. */
 internal fun BehaviorSpec.inEachContainer(body: suspend ContainerScope.() -> Unit) {
-    withData(nameFn = { "withData" }, case(1)) { _ -> body() }
     withGivens(nameFn = { "withGivens" }, case(1)) { _ -> body() }
     Context("Context") { body() }
     Given("Given") { body() }

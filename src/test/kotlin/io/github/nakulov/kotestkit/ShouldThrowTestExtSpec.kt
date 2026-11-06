@@ -189,25 +189,9 @@ class ShouldThrowTestExtSpec : StringSpec({
         calls.get() shouldBe 1
     }
 
-    "withData: shouldThrowTest и shouldThrowWithMessageTest создают успешные конечные тесты, когда блок бросает" {
+    "withGivens: shouldThrowTest и shouldThrowWithMessageTest роняют конечные тесты, а не контейнер, когда блок не бросает" {
         val run = runBehaviorSpec {
-            withData(nameFn = { "c" }, case(1)) { _ ->
-                shouldThrowTest<IllegalStateException> { error("x") }
-                shouldThrowWithMessageTest<IllegalStateException>("x") { error("x") }
-            }
-        }
-
-        val tests = run.childrenOf(listOf("c"))
-        tests.map { it.name } shouldBe listOf(
-            "throws IllegalStateException",
-            "throws IllegalStateException: \"x\"",
-        )
-        tests.map { it.result.isSuccess } shouldBe listOf(true, true)
-    }
-
-    "withData: shouldThrowTest и shouldThrowWithMessageTest роняют конечные тесты, а не контейнер, когда блок не бросает" {
-        val run = runBehaviorSpec {
-            withData(nameFn = { "c" }, case(1)) { _ ->
+            withGivens(nameFn = { "c" }, case(1)) { _ ->
                 shouldThrowTest<IllegalStateException> { }
                 shouldThrowWithMessageTest<IllegalStateException>("x") { }
             }
