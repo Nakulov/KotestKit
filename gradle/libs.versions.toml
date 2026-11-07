@@ -3,6 +3,7 @@ kotlin = "2.4.21"
 kotest = "6.2.6"
 kotlinx-coroutines = "1.10.2"
 mockk = "1.14.9"
+kover = "0.9.11"
 
 [libraries]
 # Tests
@@ -13,3 +14,4 @@ mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
