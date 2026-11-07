@@ -15,6 +15,10 @@ dependencies {
     testImplementation(libs.mockk)
 }
 
+java {
+    withSourcesJar()
+}
+
 kotlin {
     jvmToolchain(17)
 }

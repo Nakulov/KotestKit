@@ -15,3 +15,8 @@ jobs:
           java-version: 17
           cache: gradle
       - run: ./gradlew build
+      - name: Smoke test on the published artifact
+        run: |
+          ./gradlew publishToMavenLocal
+          VERSION=$(./gradlew properties -q | grep '^version:' | cut -d' ' -f2)
+          ./gradlew -p smoke test -PkotestkitVersion="$VERSION"
