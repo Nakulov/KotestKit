@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kover)
     `maven-publish`
 }
 
@@ -23,6 +24,14 @@ tasks.test {
     // ReadmeSyncSpec читает эти файлы при запуске: без входов правка только в них оставляет test в UP-TO-DATE.
     inputs.file("README.md")
     inputs.dir("src/test/kotlin/io/github/nakulov/kotestkit/readme")
+}
+
+kover {
+    reports {
+        verify {
+            rule { minBound(100) }
+        }
+    }
 }
 
 publishing {
