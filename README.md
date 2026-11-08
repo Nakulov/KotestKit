@@ -37,7 +37,7 @@ gpr.key=<токен>
 
 ```kts
 dependencies {
-    testImplementation("io.github.nakulov:kotestkit:2.0.0")
+    testImplementation("io.github.nakulov:kotestkit:2.1.0")
     testImplementation("io.mockk:mockk:1.14.9")
 }
 
