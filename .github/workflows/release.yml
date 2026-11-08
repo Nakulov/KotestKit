@@ -29,7 +29,9 @@ jobs:
             exit 1
           fi
       - name: README names this version
-        run: grep -qF "io.github.nakulov:kotestkit:$VERSION" README.md
+        run: |
+          grep -qF "io.github.nakulov:kotestkit:$VERSION" README.md
+          grep -qF "io.github.nakulov:kotestkit-serialization:$VERSION" README.md
       - name: Release notes exist
         run: test -f "release-notes/$VERSION.md"
       - run: ./gradlew build
