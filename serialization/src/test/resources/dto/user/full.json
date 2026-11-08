@@ -1,0 +1,9 @@
+{
+  "id": 1,
+  "name": "Аня",
+  "nickname": "anya",
+  "role": "ADMIN",
+  "profile": {
+    "city": "Москва"
+  }
+}

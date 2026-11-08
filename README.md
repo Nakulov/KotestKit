@@ -1,7 +1,7 @@
 # KotestKit
 
-Обёртки над Kotest: тест одним вызовом, параметризованные случаи через `withGivens` и единый стандарт формы
-unit-тестов.
+Обёртки над Kotest: тест одним вызовом, параметризованные случаи через `withGivens`, тесты соответствия JSON и DTO
+на kotlinx.serialization и единый стандарт формы unit-тестов.
 
 ## Подключение
 
@@ -46,6 +46,21 @@ tasks.test {
 }
 ```
 
+Тесты JSON — отдельный артефакт `kotestkit-serialization`, проекту без JSON он не нужен. kotlinx.serialization он не
+приносит: `kotlinx-serialization-json` подключает сам проект, не ниже 1.9.0. `kotlinx-serialization-core` приходит с
+Kotest (сейчас 1.9.0). Плагин serialization нужен для `@Serializable` в DTO:
+
+```kts
+plugins {
+    kotlin("plugin.serialization") version "<версия Kotlin проекта>"
+}
+
+dependencies {
+    testImplementation("io.github.nakulov:kotestkit-serialization:2.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+}
+```
+
 Первый тест, файл можно скопировать и запустить:
 
 ```kotlin
@@ -77,6 +92,7 @@ class GreeterTest : BehaviorSpec({
 | Значение, в том числе состояние, которое можно вернуть из блока | `shouldReturnTest` |
 | Только брошенное исключение | `shouldThrow*Test` |
 | Вызовы зависимостей, возможно вместе со значением или исключением | `given`/`when`/`then` с `verifySequence` или `coVerifySequence` |
+| Соответствие JSON и DTO | `shouldDecodeTest` / `shouldEncodeTest` внутри `withJson` |
 
 ### Правила
 
@@ -233,11 +249,60 @@ withContexts(1, 2) { n ->
 }
 ```
 
+### JSON и DTO
+
+Тест ловит расхождение DTO с форматом сервера до запуска приложения: образец ответа → ожидаемый DTO и обратно.
+Образцы — ресурсы `.json` в `src/test/resources`, путь задаётся от этого корня. `shouldDecodeTest` разбирает образец и
+сравнивает с DTO через `shouldBe`, при несовпадении Kotest называет поле. `shouldEncodeTest` кодирует DTO и сравнивает
+с образцом через `shouldEqualJson`: порядок ключей и пробелы не важны, отчёт называет путь поля. Имя теста — путь
+образца и тип, например `dto/user/full.json -> UserDto`. Своё имя и `TestConfig` задаются через `options`, как у
+`shouldReturnTest`.
+
+Целый файл, образцы лежат в `src/test/resources/dto/user/`:
+
+```kotlin
+@Serializable
+data class UserDto(val id: Long, val name: String, val nickname: String?)
+
+class UserDtoTest : BehaviorSpec({
+    withJson {
+        shouldDecodeTest("dto/user/full.json", UserDto(1, "Аня", "anya"))
+        shouldDecodeTest("dto/user/without_nickname.json", UserDto(1, "Аня", null))
+        shouldEncodeTest(UserDto(1, "Аня", "anya"), "dto/user/full.json")
+    }
+})
+```
+
+По умолчанию `withJson` берёт `DefaultTestJson`. Его флаги — требования к `Json` приложения: старый DTO читает ответ
+нового сервера.
+
+| Флаг | Зачем |
+|---|---|
+| `ignoreUnknownKeys = true` | Сервер добавил поле — старый DTO читается |
+| `explicitNulls = false` | Сервер не прислал необязательное поле — `null` |
+| `coerceInputValues = true` | Новое значение enum или `null` — значение поля по умолчанию |
+| `encodeDefaults = true` | В запрос идут все поля, без надежды на значения по умолчанию сервера |
+| `prettyPrint = true` | Читаемый JSON в отчёте о падении, на сравнение не влияет |
+
+Если у `Json` приложения другие флаги или нужен `SerializersModule` (для `@Contextual` и полиморфизма), передайте свой
+экземпляр. `Json(DefaultTestJson) { ... }` сохраняет флаги по умолчанию:
+
+```kotlin
+withJson(Json(DefaultTestJson) { serializersModule = appModule }) {
+    shouldDecodeTest("dto/payment/card.json", PaymentDto(7, BigDecimal("199.90")))
+    shouldEncodeTest(PaymentDto(7, BigDecimal("199.90")), "dto/payment/card.json")
+}
+```
+
 ## Ограничения
 
 - `shouldReturnTest` принимает до 8 входов, `expected` не считается. `case` у `withGivens` принимает до 8 аргументов,
   `expected` считается, если передаётся через `case`.
 - `withGivens` работает только в корне `BehaviorSpec`.
+- `withJson` работает только в корне `BehaviorSpec`. Внутри него тесты создают только `shouldDecodeTest` и
+  `shouldEncodeTest`, другие вызовы — ошибка компиляции. `withJson` сам тест не создаёт: тесты группы лежат в корне
+  спеки.
+- Образцы JSON только в ресурсах, строки с JSON в коде не поддерживаются.
 - Вызов внутри теста — ошибка компиляции, в том числе `then` внутри `then`.
 - Типы `expected` и результата блока при компиляции не сверяются: `Output` выводится как общий супертип, поэтому
   `shouldReturnTest(1) { "x" }` компилируется и падает при запуске. С матчером то же самое.

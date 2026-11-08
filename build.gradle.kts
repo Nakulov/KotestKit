@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kover)
-    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.kotlin.serialization)
     `maven-publish`
     `java-test-fixtures`
 }
@@ -16,6 +16,9 @@ dependencies {
 
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
+    // Пример из README для kotestkit-serialization: модуль зависит от main корня, корень от модуля только в тестах.
+    testImplementation(project(":serialization"))
+    testImplementation(libs.kotlinx.serialization.json)
 }
 
 java {
