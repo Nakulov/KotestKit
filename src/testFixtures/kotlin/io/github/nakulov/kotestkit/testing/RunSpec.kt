@@ -23,43 +23,43 @@ import io.kotest.engine.listener.AbstractTestEngineListener
 import io.kotest.engine.test.TestResult
 
 /** Прогоняет спеку из [body] отдельным запуском движка Kotest и возвращает отчёт. */
-internal suspend fun runStringSpec(body: StringSpec.() -> Unit): SpecRun =
+suspend fun runStringSpec(body: StringSpec.() -> Unit): SpecRun =
     runSpec(SpecRef.Function({ object : StringSpec(body) {} }, StringSpec::class))
 
 /** Прогоняет спеку из [body] отдельным запуском движка Kotest и возвращает отчёт. */
-internal suspend fun runBehaviorSpec(body: BehaviorSpec.() -> Unit): SpecRun =
+suspend fun runBehaviorSpec(body: BehaviorSpec.() -> Unit): SpecRun =
     runSpec(SpecRef.Function({ object : BehaviorSpec(body) {} }, BehaviorSpec::class))
 
 /** Прогоняет спеку из [body] отдельным запуском движка Kotest и возвращает отчёт. */
-internal suspend fun runFunSpec(body: FunSpec.() -> Unit): SpecRun =
+suspend fun runFunSpec(body: FunSpec.() -> Unit): SpecRun =
     runSpec(SpecRef.Function({ object : FunSpec(body) {} }, FunSpec::class))
 
 /** Прогоняет спеку из [body] отдельным запуском движка Kotest и возвращает отчёт. */
-internal suspend fun runDescribeSpec(body: DescribeSpec.() -> Unit): SpecRun =
+suspend fun runDescribeSpec(body: DescribeSpec.() -> Unit): SpecRun =
     runSpec(SpecRef.Function({ object : DescribeSpec(body) {} }, DescribeSpec::class))
 
 /** Прогоняет спеку из [body] отдельным запуском движка Kotest и возвращает отчёт. */
-internal suspend fun runFreeSpec(body: FreeSpec.() -> Unit): SpecRun =
+suspend fun runFreeSpec(body: FreeSpec.() -> Unit): SpecRun =
     runSpec(SpecRef.Function({ object : FreeSpec(body) {} }, FreeSpec::class))
 
 /** Прогоняет спеку из [body] отдельным запуском движка Kotest и возвращает отчёт. */
-internal suspend fun runWordSpec(body: WordSpec.() -> Unit): SpecRun =
+suspend fun runWordSpec(body: WordSpec.() -> Unit): SpecRun =
     runSpec(SpecRef.Function({ object : WordSpec(body) {} }, WordSpec::class))
 
 /** Прогоняет спеку из [body] отдельным запуском движка Kotest и возвращает отчёт. */
-internal suspend fun runShouldSpec(body: ShouldSpec.() -> Unit): SpecRun =
+suspend fun runShouldSpec(body: ShouldSpec.() -> Unit): SpecRun =
     runSpec(SpecRef.Function({ object : ShouldSpec(body) {} }, ShouldSpec::class))
 
 /** Прогоняет спеку из [body] отдельным запуском движка Kotest и возвращает отчёт. */
-internal suspend fun runExpectSpec(body: ExpectSpec.() -> Unit): SpecRun =
+suspend fun runExpectSpec(body: ExpectSpec.() -> Unit): SpecRun =
     runSpec(SpecRef.Function({ object : ExpectSpec(body) {} }, ExpectSpec::class))
 
 /** Прогоняет спеку из [body] отдельным запуском движка Kotest и возвращает отчёт. */
-internal suspend fun runFeatureSpec(body: FeatureSpec.() -> Unit): SpecRun =
+suspend fun runFeatureSpec(body: FeatureSpec.() -> Unit): SpecRun =
     runSpec(SpecRef.Function({ object : FeatureSpec(body) {} }, FeatureSpec::class))
 
 /** Пути контейнеров, которые создаёт [inEachContainer]. */
-internal val BEHAVIOR_CONTAINERS = listOf(
+val BEHAVIOR_CONTAINERS = listOf(
     listOf("withGivens"),
     listOf("Context"),
     listOf("Given"),
@@ -67,7 +67,7 @@ internal val BEHAVIOR_CONTAINERS = listOf(
 )
 
 /** Выполняет [body] в каждом контейнере `BehaviorSpec`. */
-internal fun BehaviorSpec.inEachContainer(body: suspend ContainerScope.() -> Unit) {
+fun BehaviorSpec.inEachContainer(body: suspend ContainerScope.() -> Unit) {
     withGivens(nameFn = { "withGivens" }, case(1)) { _ -> body() }
     Context("Context") { body() }
     Given("Given") { body() }
@@ -76,7 +76,7 @@ internal fun BehaviorSpec.inEachContainer(body: suspend ContainerScope.() -> Uni
     }
 }
 
-internal class SpecRun(
+class SpecRun(
     /** Все узлы, включая Given и When, в порядке завершения. */
     val tests: List<RanTest>,
     /** Исключение в теле спеки, иначе `null`. */
@@ -86,7 +86,7 @@ internal class SpecRun(
     fun childrenOf(path: List<String>): List<RanTest> = tests.filter { it.path.dropLast(1) == path }
 }
 
-internal class RanTest(
+class RanTest(
     /** Имена от корня до самого теста, например `["g", "w", "t"]`. */
     val path: List<String>,
     /** Префикс имени из стиля спеки, например `Given: `, иначе `null`. */

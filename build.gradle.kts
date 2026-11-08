@@ -1,9 +1,12 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kover)
+    alias(libs.plugins.kotlin.serialization) apply false
     `maven-publish`
+    `java-test-fixtures`
 }
 
+// Одна версия на все артефакты: модули берут group и version отсюда.
 group = "io.github.nakulov"
 version = "2.0.0"
 
@@ -19,6 +22,11 @@ java {
     withSourcesJar()
 }
 
+// Помощники тестов (src/testFixtures) нужны тестам модулей, но не потребителям.
+val javaComponent = components["java"] as AdhocComponentWithVariants
+javaComponent.withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
+javaComponent.withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
+
 kotlin {
     jvmToolchain(17)
 }
@@ -31,6 +39,11 @@ tasks.test {
 }
 
 kover {
+    currentProject {
+        sources {
+            excludedSourceSets.add("testFixtures")
+        }
+    }
     reports {
         verify {
             rule { minBound(100) }

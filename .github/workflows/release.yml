@@ -23,7 +23,7 @@ jobs:
         run: git merge-base --is-ancestor "$GITHUB_SHA" origin/dev
       - name: Tag matches the build version
         run: |
-          BUILD_VERSION=$(./gradlew properties -q | grep '^version:' | cut -d' ' -f2)
+          BUILD_VERSION=$(./gradlew :properties -q | grep '^version:' | cut -d' ' -f2)
           if [ "$BUILD_VERSION" != "$VERSION" ]; then
             echo "::error::Tag version $VERSION does not match build version $BUILD_VERSION"
             exit 1

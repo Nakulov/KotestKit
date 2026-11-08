@@ -20,10 +20,12 @@
 
 ## Проверка прогона спеки
 
-Помощники из `src/test/kotlin/io/github/nakulov/kotestkit/testing/RunSpec.kt` прогоняют спеку из лямбды и возвращают
+Помощники из `src/testFixtures/kotlin/io/github/nakulov/kotestkit/testing/RunSpec.kt` прогоняют спеку из лямбды и возвращают
 отчёт: `tests` и `specError`. Есть для каждого стиля: `runStringSpec`, `runBehaviorSpec`, `runFunSpec`, `runDescribeSpec`,
 `runFreeSpec`, `runWordSpec`, `runShouldSpec`, `runExpectSpec`, `runFeatureSpec`. Сами они ничего не проверяют, проверки
 пишутся матчерами Kotest. Если сломался движок Kotest, помощник бросает его ошибку: такому отчёту нельзя верить.
+Помощники — test fixtures корня: тесты корня видят их сами, модуль подключает `testImplementation(testFixtures(project(":")))`.
+Fixtures не публикуются.
 
 У теста в отчёте есть `path`, `name`, `prefix` (префикс стиля, например `Given: `, иначе `null`), `type` (контейнер или
 конечный тест), `config` и `result`. `childrenOf(path)` отбирает прямых потомков контейнера, а `inEachContainer` выполняет
