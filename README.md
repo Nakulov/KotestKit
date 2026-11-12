@@ -37,7 +37,7 @@ gpr.key=<токен>
 
 ```kts
 dependencies {
-    testImplementation("io.github.nakulov:kotestkit:2.1.0")
+    testImplementation("io.github.nakulov:kotestkit:2.2.0")
     testImplementation("io.mockk:mockk:1.14.9")
 }
 
@@ -56,7 +56,7 @@ plugins {
 }
 
 dependencies {
-    testImplementation("io.github.nakulov:kotestkit-serialization:2.1.0")
+    testImplementation("io.github.nakulov:kotestkit-serialization:2.2.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 }
 ```
