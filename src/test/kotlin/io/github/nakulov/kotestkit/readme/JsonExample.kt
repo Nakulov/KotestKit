@@ -25,6 +25,13 @@ class UserDtoTest : BehaviorSpec({
     }
 })
 
+class UserSamplesTest : BehaviorSpec({
+    withJson {
+        shouldRoundTripTest<UserDto>("dto/user/full.json")
+        shouldRoundTripTest<UserDto>("dto/user/without_nickname.json")
+    }
+})
+
 @Serializable
 data class PaymentDto(val id: Long, @Contextual val amount: BigDecimal)
 

@@ -119,6 +119,106 @@ class JsonTestScopeSpec : StringSpec({
         run.specError shouldBe null
         run.tests.single().errorMessage() shouldStartWith "Serializer for class 'Any' is not found"
     }
+
+    "shouldRoundTripTest: значения по умолчанию, явный null, целое для Float — каждый образец проходит" {
+        val run = runBehaviorSpec {
+            withJson {
+                shouldRoundTripTest<UserDto>("samples/user/defaults_omitted.json")
+                shouldRoundTripTest<UserDto>("samples/user/defaults_explicit.json")
+                shouldRoundTripTest<UserDto>("samples/user/explicit_null.json")
+                shouldRoundTripTest<SizeDto>("samples/size.json")
+            }
+        }
+
+        run.tests.map { it.name } shouldBe listOf(
+            "samples/user/defaults_omitted.json <-> UserDto",
+            "samples/user/defaults_explicit.json <-> UserDto",
+            "samples/user/explicit_null.json <-> UserDto",
+            "samples/size.json <-> SizeDto",
+        )
+        run.tests.map { it.path.size } shouldBe List(4) { 1 }
+        run.tests.map { it.result.isSuccess } shouldBe List(4) { true }
+    }
+
+    "shouldRoundTripTest: полиморфный корень через serializersModule и явный сериализатор" {
+        val run = runBehaviorSpec {
+            withJson(ComponentJson) {
+                shouldRoundTripTest<Component>("samples/component/text.json")
+                shouldRoundTripTest("samples/point.json", PointAsArray)
+            }
+        }
+
+        run.tests.map { it.name } shouldBe listOf("samples/component/text.json <-> Component", "samples/point.json <-> Point")
+        run.tests.map { it.result.isSuccess } shouldBe listOf(true, true)
+    }
+
+    "shouldRoundTripTest: потерянное поле падает с путём, первым в стеке место вызова" {
+        var line = 0
+        val run = runBehaviorSpec {
+            withJson {
+                line = nextLine()
+                shouldRoundTripTest<UserDto>("samples/user/lost_field.json")
+            }
+        }
+
+        val test = run.tests.single()
+        test.errorMessage() shouldContain "At 'role' expected 'OWNER' but was 'USER'"
+        test.firstFrame() shouldBe "JsonTestScopeSpec.kt:$line"
+    }
+
+    "shouldRoundTripTest: другой вариант и разная длина массива падают с путём" {
+        val run = runBehaviorSpec {
+            withJson(ComponentJson) {
+                shouldRoundTripTest<Component>("samples/component/video.json")
+                shouldRoundTripTest<TagsDto>("samples/tags.json")
+            }
+        }
+
+        run.tests.map { it.errorMessage() }.let { (variant, length) ->
+            variant shouldContain "At 'type' expected 'Video' but was 'Unknown'"
+            length shouldContain "At 'tags' expected array length 3 but was 2"
+        }
+    }
+
+    "shouldRoundTripTest с сериализатором: ошибка разбора — исключение kotlinx, первым в стеке место вызова" {
+        var line = 0
+        val run = runBehaviorSpec {
+            withJson {
+                line = nextLine()
+                shouldRoundTripTest("dto/user/broken.json", UserDto.serializer())
+            }
+        }
+
+        val error = run.tests.single().result.errorOrNull
+        (error is SerializationException) shouldBe true
+        error?.message shouldContain "\$.id"
+        run.tests.single().firstFrame() shouldBe "JsonTestScopeSpec.kt:$line"
+    }
+
+    "shouldRoundTripTest: нет ресурса — падение с путём, упавший образец не останавливает остальные" {
+        val run = runBehaviorSpec {
+            withJson {
+                shouldRoundTripTest<UserDto>("samples/missing.json")
+                shouldRoundTripTest("samples/missing.json", UserDto.serializer())
+                shouldRoundTripTest<UserDto>("samples/user/defaults_omitted.json")
+            }
+        }
+
+        run.tests.map { it.errorMessage() } shouldBe List(2) { "resource samples/missing.json not found" } + null
+        run.tests.last().result.isSuccess shouldBe true
+    }
+
+    "shouldRoundTripTest: options доходят до Kotest" {
+        val run = runBehaviorSpec {
+            withJson {
+                shouldRoundTripTest<UserDto>("samples/size.json", TestOptions("reified", TestConfig(enabled = false)))
+                shouldRoundTripTest("samples/point.json", PointAsArray, TestOptions("explicit", TestConfig(enabled = false)))
+            }
+        }
+
+        run.tests.map { it.name } shouldBe listOf("reified", "explicit")
+        run.tests.map { it.config?.enabled } shouldBe listOf(false, false)
+    }
 })
 
 /** Номер строки, следующей за вызовом. Кадры: сама функция, её синтетический `access$`, вызвавшая лямбда. */
