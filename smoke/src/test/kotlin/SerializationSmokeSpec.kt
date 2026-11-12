@@ -8,5 +8,6 @@ data class SmokeUser(val id: Int, val name: String)
 class SerializationSmokeSpec : BehaviorSpec({
     withJson {
         shouldDecodeTest("user.json", SmokeUser(1, "Аня"))
+        shouldRoundTripTest<SmokeUser>("user.json")
     }
 })

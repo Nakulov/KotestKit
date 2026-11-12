@@ -93,6 +93,7 @@ class GreeterTest : BehaviorSpec({
 | Только брошенное исключение | `shouldThrow*Test` |
 | Вызовы зависимостей, возможно вместе со значением или исключением | `given`/`when`/`then` с `verifySequence` или `coVerifySequence` |
 | Соответствие JSON и DTO | `shouldDecodeTest` / `shouldEncodeTest` внутри `withJson` |
+| Образец JSON без ожидаемого DTO | `shouldRoundTripTest` внутри `withJson` |
 
 ### Правила
 
@@ -294,13 +295,38 @@ withJson(Json(DefaultTestJson) { serializersModule = appModule }) {
 }
 ```
 
+#### Образец без ожидаемого значения
+
+Когда образцов много, а ожидаемых DTO нет (модели генерируются, тесты пишет генератор), эталоном служит сам образец.
+`shouldRoundTripTest<T>(resource)` разбирает образец `Json` группы, записывает результат полностью (копией этого `Json`
+с `encodeDefaults = true` и `explicitNulls = true`) и проверяет, что образец — подмножество записи. Значения по
+умолчанию и явные `null` в образце не дают ложного падения, лишние ключи записи допускаются, `1` и `1.0` равны. Если
+разбор потерял поле, отчёт называет путь: `At 'vertical.gap' expected 's' but was 'zero'`. Имя теста — путь образца и
+тип, например `dto/user/full.json <-> UserDto`.
+
+```kotlin
+class UserSamplesTest : BehaviorSpec({
+    withJson {
+        shouldRoundTripTest<UserDto>("dto/user/full.json")
+        shouldRoundTripTest<UserDto>("dto/user/without_nickname.json")
+    }
+})
+```
+
+Полиморфный корень берёт сериализатор из `serializersModule` группы: `shouldRoundTripTest<Component>(...)`. Если
+`serializer<T>()` не даёт нужного правила (`@file:UseSerializers`, `@Contextual` у корня), передайте сериализатор явно:
+`shouldRoundTripTest("samples/event/click.json", EventSerializer)`, имя теста тогда заканчивается `serialName`.
+
+Граница проверки: если значение в образце равно значению по умолчанию, потерю этого поля при разборе тест не заметит.
+Её ловят образцы со значением не по умолчанию.
+
 ## Ограничения
 
 - `shouldReturnTest` принимает до 8 входов, `expected` не считается. `case` у `withGivens` принимает до 8 аргументов,
   `expected` считается, если передаётся через `case`.
 - `withGivens` работает только в корне `BehaviorSpec`.
-- `withJson` работает только в корне `BehaviorSpec`. Внутри него тесты создают только `shouldDecodeTest` и
-  `shouldEncodeTest`, другие вызовы — ошибка компиляции. `withJson` сам тест не создаёт: тесты группы лежат в корне
+- `withJson` работает только в корне `BehaviorSpec`. Внутри него тесты создают только `shouldDecodeTest`,
+  `shouldEncodeTest` и `shouldRoundTripTest`, другие вызовы — ошибка компиляции. `withJson` сам тест не создаёт: тесты группы лежат в корне
   спеки.
 - Образцы JSON только в ресурсах, строки с JSON в коде не поддерживаются.
 - Вызов внутри теста — ошибка компиляции, в том числе `then` внутри `then`.

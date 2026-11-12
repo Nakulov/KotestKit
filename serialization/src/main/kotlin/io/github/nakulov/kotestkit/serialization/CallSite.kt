@@ -13,7 +13,7 @@ private val KOTLIN_DEBUG_LINE = Regex("""(\d+)#\d+(?:,(\d+))?:(\d+)(?:,(\d+))?""
 /**
  * Первый кадр вне модуля. Вызывать при регистрации, пока в стеке есть вызов из спеки.
  *
- * Вызовы `shouldDecodeTest` и `shouldEncodeTest` встраиваются (`inline`), и у их кода в классе спеки синтетические номера
+ * Вызовы `shouldDecodeTest`, `shouldEncodeTest` и `shouldRoundTripTest` встраиваются (`inline`), и у их кода в классе спеки синтетические номера
  * строк за концом файла. Строку вызова восстанавливает раздел KotlinDebug из SMAP класса.
  */
 internal fun callSite(): StackTraceElement {

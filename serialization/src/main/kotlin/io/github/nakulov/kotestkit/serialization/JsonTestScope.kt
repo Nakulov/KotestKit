@@ -21,10 +21,12 @@ import io.kotest.core.spec.style.scopes.BehaviorSpecRootScope
 import io.kotest.core.spec.style.scopes.RootContainerWithConfigBuilder
 import io.kotest.core.test.TestScope
 import io.kotest.core.test.config.TestConfig
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
+import kotlin.reflect.typeOf
 
-private const val ONLY_JSON_TESTS = "Внутри withJson тесты регистрируют только shouldDecodeTest и shouldEncodeTest"
+private const val ONLY_JSON_TESTS = "Внутри withJson тесты регистрируют только shouldDecodeTest, shouldEncodeTest и shouldRoundTripTest"
 
 /**
  * Приёмник блока [withJson]. Заглушки ниже — члены класса: член внутреннего приёмника перекрывает функции спеки,
@@ -42,6 +44,24 @@ class JsonTestScope internal constructor(
     /** Тест: DTO -> ресурс. Имя по умолчанию: `UserDto -> dto/user/full.json`. Сравнение через `shouldEqualJson`. */
     inline fun <reified T : Any> shouldEncodeTest(value: T, resource: String, options: TestOptions = TestOptions()) {
         encodeTest(spec, json, value, resource, T::class.simpleName, options) { json.serializersModule.serializer<T>() }
+    }
+
+    /**
+     * Тест: ресурс -> T -> полная запись, образец — подмножество записи. Имя по умолчанию: `samples/layout/max.json <-> Layout`.
+     *
+     * Разбор — [json] группы, запись — его копией с `encodeDefaults` и `explicitNulls`: значения по умолчанию и явные `null`
+     * в образце не дают ложного падения. Лишние ключи записи допускаются, числа сравниваются по значению.
+     */
+    inline fun <reified T : Any> shouldRoundTripTest(resource: String, options: TestOptions = TestOptions()) {
+        roundTripTest(spec, json, resource, T::class.simpleName, options, typeOf<T>())
+    }
+
+    /**
+     * То же с явным сериализатором корня: когда `serializer<T>()` не даёт нужного правила (`@file:UseSerializers`,
+     * `@Contextual`). Имя по умолчанию: `<ресурс> <-> <serialName>`.
+     */
+    fun <T : Any> shouldRoundTripTest(resource: String, serializer: KSerializer<T>, options: TestOptions = TestOptions()) {
+        roundTripTest(spec, json, resource, serializer.descriptor.serialName, options, serializer)
     }
 
     // Тесты ядра KotestKit
