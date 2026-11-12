@@ -8,7 +8,7 @@ plugins {
 
 // Одна версия на все артефакты: модули берут group и version отсюда.
 group = "io.github.nakulov"
-version = "2.1.0"
+version = "2.2.0"
 
 dependencies {
     api(libs.kotest.runner.junit5)
